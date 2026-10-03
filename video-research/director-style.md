@@ -101,7 +101,7 @@
   - В кураже насыщенный максимализм (Поиск), но фирменный цвет всё равно один.
 - **Фирменный цвет только на герое и продукте:** жёлтый курьер, коралловый шарф, оранжевый костюм, лавандовый чехол, оранжевое фрисби.
 - **Всегда тепло:** R−B от +23 до +41. Свет мотивирован: окно, лампы в кадре.
-- **Тени глубокие** (чёрное 8–12 из 255), **не «молочные»**. ⚠️ *В брифе для баннеров у нас приподнятые молочные тени. Для роликов «как у Яндекса» решите, что берём.*
+- **Тени глубокие, как у Яндекса** (чёрное 8–12 из 255), **не «молочные»**. ✅ *Решение 03.10.2026 для роликов. Баннеры остаются по брифу, пока не решим иначе.*
 - **Резкость фона зависит от регистра:** в спокойном фон в 2,5–3 раза мягче героя, в кураже почти всё резко.
 
 ## 7. Ритм
@@ -150,7 +150,7 @@ square to the walls. 47° FOV for travel and dialogue, 29° for faces and insert
 for a comic accent, close to the face. Changes of place happen inside the move: a wall
 sliding past the lens, an object crossing the lens, a whip pan, or a match cut on the hero
 at the same spot in frame. Lived-in spaces with a calm palette; the brand colour lives only
-on the hero's wardrobe and the product; warm motivated light.
+on the hero's wardrobe and the product; warm motivated light with deep, true blacks.
 ```
 
 Фразы для отдельных приёмов лежат в файлах роликов, в разделах «Seedance». Перед боевой генерацией проверяем их на коротких черновиках и отмечаем, что сработало.
