@@ -1,8 +1,15 @@
-# «Новосёл»: промпты для ChatGPT, v3
+# «Новосёл»: промпты для ChatGPT, v4
 
-Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v3 от 04.10.2026: игра актёров переписана по разбору эмоций в роликах Яндекса.
+Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v4 от 04.10.2026: игра актёров по разбору эмоций (v3), цвет и фотостиль по пяти стилевым референсам дизайнера (v4).
 
 Это **набор инструкций для Claude в десктоп-приложении**: он генерирует картинки в ChatGPT через браузер дизайнера. Сценарий и раскадровка — [`storyboard.md`](storyboard.md).
+
+## Что изменилось в v4
+
+- **Цвет и фотостиль** теперь опираются на пять стилевых референсов дизайнера, REF-STYLE-A…E (раздел «Стилевые референсы»).
+  - Стиль описан словами в общем блоке каждого кадра.
+  - В фонах и раскадровке нужный кадр прикладывается последней картинкой, только как образец цвета и света.
+- Листы персонажей и предметов не менялись.
 
 ## Что изменилось в v3
 
@@ -32,6 +39,31 @@
   - в коробке теперь фото семьи коз, а не пейзаж: сначала делаем фото, потом коробку с ним в рефах;
   - на вставке 7 коробку несёт коза, а не мама.
 - **♻️ Можно не перегенерировать** клубок, шарф, панель лифта, авоську, ёлку в сетке, гирлянду и санки, если листы v1 понравились.
+
+## Стилевые референсы: основа цвета и фотостиля
+
+Дизайнер выбрал пять кадров как эталон цвета и фотостиля (04.10.2026). Найди их у дизайнера на компьютере по описанию.
+
+| Код | Кадр |
+|---|---|
+| **REF-STYLE-A** | Квартира: мужчина в клетчатой рубашке танцует в прихожей, утреннее солнце из окна слева, светлая кухня с голубыми фасадами, красные ковры |
+| **REF-STYLE-B** | Летний двор: женщина в розовой футболке на качелях с телефоном, кружевные тени листвы на лице, светлый дом, девочка на качелях |
+| **REF-STYLE-C** | Крупно парень в чёрных очках и красной худи: мокрое лицо, контровой свет, зелёный размытый фон |
+| **REF-STYLE-D** | Батарея с белым терморегулятором «22°» у окна: солнечные полосы, глиняные горшки, льняная штора |
+| **REF-STYLE-E** | Девушка в зелёной майке медитирует у больших окон, жёлтые кубики и мяч, свет сзади |
+
+**Что в них общего** (замеры по пяти кадрам):
+- **Свет:** тёплый натуральный, с чёткими пятнами и тенями от реального источника — окна, листвы.
+- **Яркость:** медиана 78–121 из 255. Пересвета нет совсем, светлые места не выше 206–233.
+- **Тени:** глубокие (1-й перцентиль 5–45), но мягкие.
+- **Цвет:** насыщенность умеренная (0,25–0,37), тёплый баланс (R − B от +18 до +52). Кремово-бежевая основа и 1–2 сочных акцента: голубые фасады и красный ковёр, розовая футболка, красная худи, зелёная майка и жёлтый мяч.
+- **Пространство:** живая обжитая фактура, малая глубина резкости, плёночное зерно.
+
+**Как используем:**
+- в промптах раскадровки и фонов этот стиль описан словами в общем блоке;
+- там, где в рефах стоит `REF-STYLE-…`, кадр прикладывается **последней картинкой**, только как образец цвета и света;
+- листы персонажей и предметов остаются на сером фоне, без стилевых референсов;
+- наша палитра бренда при этом остаётся в одежде и предметах: стилевой кадр задаёт свет и тон, а не цвета вещей.
 
 ## Фотостиль v2: как у Яндекса, а не «нейросеть»
 
@@ -90,11 +122,9 @@
 4. Субагентов не запускать, пока дизайнер не попросит.
 5. **Детей и подростков генерируем только по словам.** Фото реальных детей не прикладывать. Листы детей, которые мы сами сгенерируем, в раскадровку тоже не прикладываем: дети в раскадровке описаны словами.
 6. Прошлые генерации из папок «Рендеры» в рефы не идут.
-7. **Чужие референсы — только образец приёма. В ChatGPT их не прикладывать:**
-   - образцы сеток (мокрая девушка, фиолетовая папка, робот Яндекса);
-   - кадры роликов Яндекса.
-
-   Всё, что мы у них взяли, уже описано в промптах словами.
+7. **Чужие референсы — только образец приёма.**
+   - Образцы сеток (мокрая девушка, фиолетовая папка, робот Яндекса) в ChatGPT не прикладываем.
+   - Пять **стилевых референсов REF-STYLE-A…E** дизайнер выбрал основой цвета и фотостиля. Их прикладываем **только там, где они стоят в рефах, и всегда последней картинкой**. Из них берём только цвет и свет; людей, предметы, место, сезон и композицию не берём.
 8. **Палитра бренда — в одежде и предметах** (таблица ниже). Лайм — самый яркий акцент. Чёрной и тёмно-синей одежды нет. На предметах нет логотипов и надписей.
 9. **Свет как в кино.** Источник сбоку-сзади рисует контур волос, шерсти и пара изо рта. Лицо при этом читается мягкой подсветкой спереди. Эмоции сдержанные, у всех разные, никто не позирует.
 10. Без катка. Ёлка во дворе есть.
@@ -670,17 +700,20 @@ Product reference sheet for a live-action TV commercial, 16:9 landscape, split i
 - **Рефы** (строго в этом порядке):
   1. REF-SS2-A
   2. REF-SS2-B
+  3. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-L01_opushka_1.png`
 - **Что изменилось с v1:** свет сбоку-сзади вместо золотого сияния.
 
 ```text
+Image 3 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Images 1 and 2 show the residential complex; keep its architecture exactly — light-grey brick, graphite top floors, terracotta-red blocks, black window frames — but turn the season to deep winter.
 
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 Point of view from inside the edge of a snowy spruce forest at a height of 1.5 m: heavy snow-laden spruce branches frame the shot on the left, the right and the top, soft in the foreground; through the opening, a wide snowy field, and on its far side the residential complex from images 1 and 2, crisp in the clean frosty air, roofs white with snow. Loose snow drifts in the air, lit from behind by the sun; long cool-blue shadows across the field; a clear pale-blue winter sky.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ### N-L02 · Двор зимой (кадры 4–8, запасные реакции) · А
@@ -688,17 +721,20 @@ It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and gr
 - **Рефы** (строго в этом порядке):
   1. REF-SS2-C
   2. REF-SS2-A
+  3. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-L02_dvor_1.png`
 - **Что изменилось с v1:** палитра в деталях двора: шары на ёлке, санки, детская лопатка; свет сбоку-сзади.
 
 ```text
+Image 3 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Image 1 shows the courtyard and image 2 the facades of the residential complex; keep the architecture and the playground exactly, but turn the season to winter.
 
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 An eye-level view across the courtyard: the playground with its cylindrical wooden-slat towers and the stainless steel slide under snow caps, the orange rubber surface showing only in small patches; a tall spruce in the yard decorated with warm-white lights and baubles in cornflower blue, sky blue and lime; cleared paving paths with neat snowbanks; a cornflower-blue sled leaning against a wooden bench and a child's lime snow shovel stuck in a snowbank; a few snow-covered parked cars at the edge; the facades behind — light-grey brick with the two lower floors in graphite, black window frames, normal-size windows.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 **Проверить:**
@@ -708,31 +744,37 @@ It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and gr
 
 - **Рефы** (строго в этом порядке):
   1. REF-SS2-C
+  2. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-L03_podezd_1.png`
 - **Что изменилось с v1:** венок с васильковой лентой; свет сбоку-сзади.
 
 ```text
+Image 2 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Image 1 shows the residential complex; keep its architecture — light-grey brick, graphite ground floors, black window frames — but in winter.
 
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 A building entrance on the graphite ground floor, seen straight on from the path at shoulder height: a dark metal-framed glass door under a slim canopy with a spruce wreath tied with a cornflower-blue ribbon, three wide grey stone steps brushed clean of snow, neat snowbanks on both sides, warm light glowing through the glass from the bright lobby; above, light-grey brick with black window frames.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. The sun sits to the side and slightly behind, giving warm rim light to the snow edges and branches; the snow keeps its texture in the highlights and turns cool blue in the shade; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ### N-L04 · Холл с лифтом (кадры 10–13, пэкшот) · А
 
-- **Рефы:** без рефов.
+- **Рефы** (строго в этом порядке):
+  1. REF-STYLE-E — стилевой референс, только цвет и свет
 - **Файл:** `N-L04_holl_1.png`
 - **Что изменилось с v1:** светлый холл: бледный камень, светлый дуб, бледно-голубая стена вместо коричневого.
 
 ```text
+Image 1 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 A bright modern residential lobby seen strictly frontally and symmetrically at chest height: a polished pale stone floor; in the right half of the frame the elevator — brushed-steel doors set in a wall of light oak panels, a slim brushed-graphite call panel to the right of the doors; the left half of the frame is a calm, empty wall of smooth pale ice-blue plaster (#DAEEFC), softly washed with light from above, with nothing on it.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Soft daylight from the glass entrance mixed with warm-neutral downlights; balanced colour, never orange-brown; 40 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Soft daylight from the glass entrance mixed with warm-neutral downlights; balanced colour, never orange-brown; 40 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 **Проверить:**
@@ -741,16 +783,19 @@ It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and gr
 
 ### N-L05 · Кабина лифта (кадры 12–13) · А
 
-- **Рефы:** без рефов.
+- **Рефы** (строго в этом порядке):
+  1. REF-STYLE-A — стилевой референс, только цвет и свет
 - **Файл:** `N-L05_kabina_1.png`
 - **Что изменилось с v1:** светлая кабина вместо тёмно-коричневой.
 
 ```text
+Image 1 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 A strictly frontal, symmetric view at chest height into an open elevator cabin, the brushed-steel doors fully open: light oak veneer on three walls, a brushed-steel handrail at hip height, a soft neutral-white light panel in the ceiling, a pale stone floor.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Soft daylight from the glass entrance mixed with warm-neutral downlights; balanced colour, never orange-brown; 40 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Soft daylight from the glass entrance mixed with warm-neutral downlights; balanced colour, never orange-brown; 40 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ---
@@ -773,14 +818,17 @@ It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and gr
   4. N-K02 мужчина
   5. N-P09 машина
   6. N-P08 щётка
+  7. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-SB1_kadry_01-04_1.png`
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the goat character (keep her exactly: tall and slender, sleek white coat, blue aviator sunglasses, lime scarf); image 2 — the forest edge with the view of the residential complex; image 3 — the courtyard; image 4 — the man; image 5 — his car; image 6 — his snow brush.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (1, 2, 3, 4) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -806,15 +854,18 @@ People are real, characterful and unglamorous, with natural skin texture; each f
   4. N-K04 мама
   5. N-K05 дворник
   6. N-P10 лопата
+  7. REF-STYLE-C — стилевой референс, только цвет и свет
 - **Файл:** `N-SB2_kadry_05-08_1.png`
 - Мальчик описан словами, его лист не прикладываем.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the goat character (keep her exactly); image 2 — her packed moving box; image 3 — the courtyard; image 4 — the mother; image 5 — the yard keeper; image 6 — his snow shovel.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (5, 6, 7, 8) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -841,14 +892,17 @@ People are real, characterful and unglamorous, with natural skin texture; each f
   4. N-K07 женщина ~50
   5. N-L04 холл
   6. N-K08 парень
+  7. REF-STYLE-D — стилевой референс, только цвет и свет
 - **Файл:** `N-SB3_kadry_09-12_1.png`
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the goat carrying her box (keep her look and the box exactly); image 2 — the building entrance; image 3 and image 4 — the couple; image 5 — the lobby with the elevator; image 6 — the young man.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (9, 10, 11, 12) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Interiors: a bright modern lobby and elevator — soft daylight from the glass entrance mixed with warm-neutral downlights; pale stone, light oak, brushed steel and pale ice-blue plaster; balanced colour, never orange-brown. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Interiors: a bright modern lobby and elevator — soft daylight from the glass entrance mixed with warm-neutral downlights; pale stone, light oak, brushed steel and pale ice-blue plaster; balanced colour, never orange-brown. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -873,14 +927,17 @@ People are real, characterful and unglamorous, with natural skin texture; each f
   2. N-K08 парень
   3. N-L04 холл
   4. N-L05 кабина
+  5. REF-STYLE-E — стилевой референс, только цвет и свет
 - **Файл:** `N-SB4_kadr_13_pekshot_1.png`
 
 ```text
+Image 5 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the goat carrying her box; image 2 — the young man; image 3 — the lobby; image 4 — the elevator cabin. Keep all of them exactly.
 
 A single film still — the final shot of a live-action TV commercial, 16:9 landscape.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Interiors: a bright modern lobby and elevator — soft daylight from the glass entrance mixed with warm-neutral downlights; pale stone, light oak, brushed steel and pale ice-blue plaster; balanced colour, never orange-brown. Colour: lively and fresh — pale stone, light oak and pale ice-blue plaster, with the brand palette carried by clothes and objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Interiors: a bright modern lobby and elevator — soft daylight from the glass entrance mixed with warm-neutral downlights; pale stone, light oak, brushed steel and pale ice-blue plaster; balanced colour, never orange-brown. Colour: lively and fresh — pale stone, light oak and pale ice-blue plaster, with the brand palette carried by clothes and objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -901,15 +958,18 @@ A wide, strictly frontal and symmetric view of the bright lobby from image 3 at 
   4. N-K11 хозяйка собаки
   5. N-K12 бигль
   6. N-P14 термос
+  7. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-SB5_reaktsii_1-4_1.png`
 - Подросток описан словами.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the courtyard; image 2 — the man with the spruce; image 3 — the grandmother; image 4 — the dog owner; image 5 — the beagle; image 6 — the thermos. Every still takes place in the courtyard from image 1; in every still the person looks at something just to the left of the camera that we never see.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (R1, R2, R3, R4) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -930,15 +990,18 @@ R4 — On the playground swing, 50 mm lens look: a lanky boy of about fifteen wi
   3. N-P16 гирлянда
   4. N-P17 снеговик
   5. N-P15 санки
+  6. REF-STYLE-B — стилевой референс, только цвет и свет
 - **Файл:** `N-SB6_reaktsii_5-7_1.png`
 - Дети описаны словами.
 
 ```text
+Image 6 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the courtyard and its buildings; image 2 — the woman; image 3 — her garland; image 4 — the snowman; image 5 — the sled. In every still the people look at something just to the left of the camera that we never see.
 
 Storyboard sheet: three film stills from the same live-action TV commercial stacked vertically in a portrait sheet, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (R5, R6, R7) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: a clear frosty winter day; the sun sits to the side and slightly behind the subjects, outlining hair, fur, breath and the edges of the snow with warm rim light, while faces get soft fill bounced off the snow and stay fully readable; the snow keeps its texture in the highlights and turns cool blue in the shade. Colour: lively and fresh — white snow, blue sky and warm sunlight, with the brand palette carried by clothes and everyday objects: cornflower blue #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC and lime #ADFC30; the goat's lime scarf is the strongest accent; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 

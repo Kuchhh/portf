@@ -35,8 +35,41 @@ FILM = (
     "Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a "
     "modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight "
     "roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but "
-    "recognisable background, foreground layers where natural."
+    "recognisable background, foreground layers where natural. Colour grade: warm, natural and gently "
+    "contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow "
+    "shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep "
+    "shadows, real lived-in detail."
 )
+
+# Стилевые референсы дизайнера (04.10.2026): основа цвета и фотостиля. Прикладываются последней картинкой.
+STYLE_REFS = {
+    "REF-STYLE-A": "квартира: мужчина в клетчатой рубашке танцует в прихожей, утреннее солнце из окна слева, светлая кухня с голубыми фасадами, красные ковры",
+    "REF-STYLE-B": "летний двор: женщина в розовой футболке на качелях с телефоном, кружевные тени листвы на лице, светлый дом, девочка на качелях",
+    "REF-STYLE-C": "крупно парень в чёрных очках и красной худи, мокрое лицо, контровой свет, зелёный размытый фон",
+    "REF-STYLE-D": "батарея с белым терморегулятором «22°» у окна, солнечные полосы, горшки, льняная штора",
+    "REF-STYLE-E": "девушка в зелёной майке медитирует у больших окон, жёлтые кубики и мяч, свет сзади",
+}
+STYLE_SENTENCE = (
+    "Image {n} is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and "
+    "film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; "
+    "everything in the frame comes from the text and the other references."
+)
+
+
+def apply_style(spec):
+    """Добавляет стилевой референс последней картинкой туда, где в спецификации стоит style."""
+    if getattr(spec, "_styled", False):
+        return
+    for _, _, items in spec.SECTIONS:
+        for it in items:
+            code = it.get("style")
+            if not code:
+                continue
+            refs = list(it.get("refs") or [])
+            refs.append(f"{code} — стилевой референс, только цвет и свет")
+            it["refs"] = refs
+            it["prompt"] = STYLE_SENTENCE.format(n=len(refs)) + "\n\n" + it["prompt"]
+    spec._styled = True
 FILM_SINGLE = FILM.replace("Each still is", "It is")
 PEOPLE = (
     "People are real, characterful and unglamorous, with natural skin texture; each face is caught in the "
@@ -177,8 +210,8 @@ def validate(spec):
                 errors.append(f"повтор файла {it['file']}")
             seen_files.add(it["file"])
             refs = it.get("refs") or []
-            if len(refs) > 6:
-                errors.append(f"{it['id']}: рефов {len(refs)} > 6")
+            if len(refs) > 7:
+                errors.append(f"{it['id']}: рефов {len(refs)} > 7")
             used = [int(x) for x in re.findall(r"\bimages? (\d+)", it["prompt"], re.I)]
             used += [int(x) for x in re.findall(r"\bimages \d+ and (\d+)", it["prompt"], re.I)]
             used += [int(b) for a, b in re.findall(r"\bimages (\d+)[–-](\d+)", it["prompt"], re.I)]
@@ -199,6 +232,7 @@ def palette_table():
 
 
 def build(spec, export_names=None):
+    apply_style(spec)
     n = validate(spec)
     parts = [spec.HEADER(palette_table(), export_names)]
     for title, intro, items in spec.SECTIONS:

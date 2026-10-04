@@ -1,8 +1,15 @@
-# «Овация»: промпты для ChatGPT, v3
+# «Овация»: промпты для ChatGPT, v4
 
-Ролик застройщика «Развитие» для **арт-квартала «Зарядье»**. YouTube, 16:9, 20 секунд, финальная фраза **«Лучший застройщик года»**. Версия v3 от 04.10.2026: игра актёров переписана по разбору эмоций в роликах Яндекса.
+Ролик застройщика «Развитие» для **арт-квартала «Зарядье»**. YouTube, 16:9, 20 секунд, финальная фраза **«Лучший застройщик года»**. Версия v4 от 04.10.2026: игра актёров по разбору эмоций (v3), цвет и фотостиль по пяти стилевым референсам дизайнера (v4).
 
 Это **набор инструкций для Claude в десктоп-приложении**: он генерирует картинки в ChatGPT через браузер дизайнера. Сценарий и раскадровка — [`storyboard.md`](storyboard.md).
+
+## Что изменилось в v4
+
+- **Цвет и фотостиль** теперь опираются на пять стилевых референсов дизайнера, REF-STYLE-A…E (раздел «Стилевые референсы»).
+  - Стиль описан словами в общем блоке каждого кадра.
+  - В фонах и раскадровке нужный кадр прикладывается последней картинкой, только как образец цвета и света.
+- Листы персонажей и предметов не менялись.
 
 ## Что изменилось в v3
 
@@ -25,6 +32,31 @@
   - Люди в синих тонах палитры, без чёрного и тёмно-синего.
   - Лайм — самый яркий акцент на бабочке дедушки.
 - **Пасхалка 9б** — с новой, изящной козой из «Новосёла» v2.
+
+## Стилевые референсы: основа цвета и фотостиля
+
+Дизайнер выбрал пять кадров как эталон цвета и фотостиля (04.10.2026). Найди их у дизайнера на компьютере по описанию.
+
+| Код | Кадр |
+|---|---|
+| **REF-STYLE-A** | Квартира: мужчина в клетчатой рубашке танцует в прихожей, утреннее солнце из окна слева, светлая кухня с голубыми фасадами, красные ковры |
+| **REF-STYLE-B** | Летний двор: женщина в розовой футболке на качелях с телефоном, кружевные тени листвы на лице, светлый дом, девочка на качелях |
+| **REF-STYLE-C** | Крупно парень в чёрных очках и красной худи: мокрое лицо, контровой свет, зелёный размытый фон |
+| **REF-STYLE-D** | Батарея с белым терморегулятором «22°» у окна: солнечные полосы, глиняные горшки, льняная штора |
+| **REF-STYLE-E** | Девушка в зелёной майке медитирует у больших окон, жёлтые кубики и мяч, свет сзади |
+
+**Что в них общего** (замеры по пяти кадрам):
+- **Свет:** тёплый натуральный, с чёткими пятнами и тенями от реального источника — окна, листвы.
+- **Яркость:** медиана 78–121 из 255. Пересвета нет совсем, светлые места не выше 206–233.
+- **Тени:** глубокие (1-й перцентиль 5–45), но мягкие.
+- **Цвет:** насыщенность умеренная (0,25–0,37), тёплый баланс (R − B от +18 до +52). Кремово-бежевая основа и 1–2 сочных акцента: голубые фасады и красный ковёр, розовая футболка, красная худи, зелёная майка и жёлтый мяч.
+- **Пространство:** живая обжитая фактура, малая глубина резкости, плёночное зерно.
+
+**Как используем:**
+- в промптах раскадровки и фонов этот стиль описан словами в общем блоке;
+- там, где в рефах стоит `REF-STYLE-…`, кадр прикладывается **последней картинкой**, только как образец цвета и света;
+- листы персонажей и предметов остаются на сером фоне, без стилевых референсов;
+- наша палитра бренда при этом остаётся в одежде и предметах: стилевой кадр задаёт свет и тон, а не цвета вещей.
 
 ## Фотостиль v2: как у Яндекса, а не «нейросеть»
 
@@ -83,11 +115,9 @@
 4. Субагентов не запускать, пока дизайнер не попросит.
 5. **Детей и подростков генерируем только по словам.** Фото реальных детей не прикладывать. Листы детей, которые мы сами сгенерируем, в раскадровку тоже не прикладываем: дети в раскадровке описаны словами.
 6. Прошлые генерации из папок «Рендеры» в рефы не идут.
-7. **Чужие референсы — только образец приёма. В ChatGPT их не прикладывать:**
-   - образцы сеток (мокрая девушка, фиолетовая папка, робот Яндекса);
-   - кадры роликов Яндекса.
-
-   Всё, что мы у них взяли, уже описано в промптах словами.
+7. **Чужие референсы — только образец приёма.**
+   - Образцы сеток (мокрая девушка, фиолетовая папка, робот Яндекса) в ChatGPT не прикладываем.
+   - Пять **стилевых референсов REF-STYLE-A…E** дизайнер выбрал основой цвета и фотостиля. Их прикладываем **только там, где они стоят в рефах, и всегда последней картинкой**. Из них берём только цвет и свет; людей, предметы, место, сезон и композицию не берём.
 8. **Палитра бренда — в одежде и предметах** (таблица ниже). Лайм — самый яркий акцент. Чёрной и тёмно-синей одежды нет. На предметах нет логотипов и надписей.
 9. **Свет как в кино.** Источник сбоку-сзади рисует контур волос, шерсти и пара изо рта. Лицо при этом читается мягкой подсветкой спереди. Эмоции сдержанные, у всех разные, никто не позирует.
 10. Двор без машин. Спортплощадка под ровным снегом, катка нет.
@@ -513,10 +543,13 @@ Product reference sheet for a live-action TV commercial, 16:9 landscape, split i
 
 - **Рефы** (строго в этом порядке):
   1. REF-ZR-A
+  2. REF-STYLE-A — стилевой референс, только цвет и свет
 - **Файл:** `O-L01_razrez_doma_1.png`
 - **Что изменилось с v1:** у каждой комнаты свой цвет из палитры вместо «тёплого» однотона.
 
 ```text
+Image 2 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Image 1 shows the residential quarter; use only the facade of the white-brick tower with graphite vertical bands for the outer edges of the building.
 
 Photorealistic architectural cut-away of a modern residential tower at winter blue hour, like a dollhouse with the whole front wall removed, portrait orientation 2:3, viewed perfectly straight on with a long lens, no perspective distortion, an empty scene with no people. Thick, deep-black section cuts of walls and floor slabs divide the building into rooms of equal height. Top floor, left: a cosy living room with pale ice-blue walls (#DAEEFC) — a caramel-brown leather armchair, a warm floor lamp, bookshelves, framed family photos, a small spruce with warm lights and baubles in blue and lime, oak parquet. Top floor, right: a nursery with sky-blue walls (#66A3FF), a white crib and a warm night lamp. One floor down, right: a teenager's room with azure walls (#1A45D5), a desk with a glowing monitor and a lime desk lamp (#ADFC30). Below that, right: a kitchen with white cabinets, an oak worktop, a cornflower-blue tiled backsplash (#0F7DF5) and a warm pendant lamp. Ground floor: a lobby with a pale stone floor, an oak concierge desk, a pale ice-blue wall and glass entrance doors on the right. The remaining rooms on the left are lived-in flats with warm light and walls in light, calm colours. Every room has one normal-size window in its back wall — black frame, white sill — with the snowy deep-blue evening outside. Warm interior light, deep true blacks in the cuts, gentle highlight roll-off, fine film grain. Clean image: no text, no letters, no numbers, no logos.
@@ -532,17 +565,20 @@ Photorealistic architectural cut-away of a modern residential tower at winter bl
 
 - **Рефы** (строго в этом порядке):
   1. O-L01 (утверждённый разрез)
+  2. REF-STYLE-E — стилевой референс, только цвет и свет
 - **Файл:** `O-L02_gostinaya_1.png`
 - **Что изменилось с v1:** бледно-голубые стены.
 
 ```text
+Image 2 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 Image 1 is the cut-away of the building; this is its top-floor living room on the left — keep the furniture and the colours exactly.
 
 Photorealistic location plate for a live-action TV commercial, 16:9 landscape, an empty scene with no people.
 
 The cosy top-floor living room seen strictly frontally and planimetrically through the removed front wall, at the eye height of a seated person: in the centre the caramel-brown leather armchair facing the camera, a small side table with a lace doily, a warm floor lamp just behind the armchair on the left, bookshelves and a wall of framed family photos, a small spruce with warm lights and blue and lime baubles in the corner, oak parquet, pale ice-blue walls (#DAEEFC); in the back wall a normal-size window with a black frame and a white sill, the snowy deep-blue evening outside. The thick black cut of the wall frames the right edge of the shot.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Warm lamps inside, the deep-blue snowy evening in the window; balanced colour, never orange-brown; 40 mm lens look, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Warm lamps inside, the deep-blue snowy evening in the window; balanced colour, never orange-brown; 40 mm lens look, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ### O-L03 · Двор зимним вечером (кадры 6–8) · А
@@ -560,7 +596,7 @@ Photorealistic location plate for a live-action TV commercial, 16:9 landscape, a
 
 An eye-level view across the car-free inner courtyard: the sports court lies under smooth untouched snow; the playground with curved wooden structures under snow caps, its shade sails taken down for winter; cleared paving paths lined with neat snowbanks; a spruce in the yard with warm lights and blue and lime baubles; a sky-blue sled by a bench; warm street lamps; behind, the towers from the references — brown-red brick with white window surrounds, beige-sand brick with black slatted boxes, white brick with graphite vertical bands — their normal-size windows glowing warm, and the black steel pergola with a glass roof by one of the entrances. No cars in the yard.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Winter blue hour just after sunset: a deep-blue sky, blue snow, warm 3000 K windows and lamps, gentle snowfall; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Winter blue hour just after sunset: a deep-blue sky, blue snow, warm 3000 K windows and lamps, gentle snowfall; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 **Проверить:**
@@ -579,7 +615,7 @@ Photorealistic location plate for a live-action TV commercial, 16:9 landscape, a
 
 The wooden pedestrian bridge with tall vertical timber slats of different heights on both sides and a plank deck with a thin layer of fresh snow, small warm lamps set low along the railing, looking along the bridge towards the towers — beige-sand brick with black slatted boxes and white brick with graphite vertical bands — their normal-size windows glowing warm.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Winter blue hour just after sunset: a deep-blue sky, blue snow, warm 3000 K windows and lamps, gentle snowfall; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Winter blue hour just after sunset: a deep-blue sky, blue snow, warm 3000 K windows and lamps, gentle snowfall; 35 mm lens look, about 47° horizontal field of view, level horizon. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ### O-L05 · Белая башня снизу (кадр 10) · А
@@ -596,7 +632,7 @@ Photorealistic location plate for a live-action TV commercial, 16:9 landscape, a
 
 A worm's-eye view from the snowy ground at the very foot of the white-brick tower, an ultra-wide lens about 84° horizontal field of view, looking straight up the facade, which converges dramatically towards the deep-blue sky; the windows of the lower half glow warm, the upper floors are still dark; snowflakes fly towards the lens.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Winter blue hour, deep-blue sky, warm windows. Clean image: no text, no letters, no numbers, no logos, no signs.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Winter blue hour, deep-blue sky, warm windows. Clean image: no text, no letters, no numbers, no logos, no signs.
 ```
 
 ---
@@ -619,15 +655,18 @@ It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and gr
   4. O-K04 хозяйка
   5. O-P03 пирожки
   6. O-L01 разрез
+  7. REF-STYLE-A — стилевой референс, только цвет и свет
 - **Файл:** `O-SB1_kadry_01-04_1.png`
 - Подросток описан словами.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the grandfather (keep him exactly, with his lime bow tie and azure cardigan); image 2 — his living room; image 3 — the young mother with the baby; image 4 — the woman in the striped apron; image 5 — her tray of pirozhki and oven mitts; image 6 — the cut-away of the whole building, showing where each room is.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (1, 2, 3, 4) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -653,15 +692,18 @@ People are real, characterful and unglamorous, with natural skin texture; each f
   4. O-P06 ковёр
   5. O-L03 двор
   6. O-K09 пёс
+  7. REF-STYLE-A — стилевой референс, только цвет и свет
 - **Файл:** `O-SB2_kadry_05-08_1.png`
 - Дети описаны словами.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the concierge; image 2 — the cut-away of the building (its ground-floor lobby); image 3 — the man with the carpet beater; image 4 — the carpet; image 5 — the courtyard; image 6 — the dog.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (5, 6, 7, 8) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -683,15 +725,18 @@ People are real, characterful and unglamorous, with natural skin texture; each f
   4. лист козы N-K01 v2 из «Новосёла»
   5. O-L05 башня снизу
   6. лист дедушки O-K01
+  7. REF-STYLE-C — стилевой референс, только цвет и свет
 - **Файл:** `O-SB3_kadry_09-11_1.png`
 - Если лист козы v2 из «Новосёла» ещё не утверждён, сделай этот лист позже.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the wooden bridge; image 2 — the young man with grocery bags; image 3 — the young woman; image 4 — the white goat character from our previous film (keep her exactly: tall and slender, blue aviator sunglasses, lime scarf); image 5 — the white-brick tower from below; image 6 — the grandfather (keep him exactly, with his lime bow tie and azure cardigan).
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (9, 9b, 10, 11) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -720,7 +765,7 @@ References: image 1 — the wooden bridge at winter blue hour; image 2 — the b
 
 A single film still — the final shot of a live-action TV commercial, 16:9 landscape.
 
-It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
+It is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 
@@ -739,15 +784,18 @@ A wide view from the wooden bridge at winter blue hour, 40 mm lens look: the tal
   4. O-P11 лыжи
   5. O-K15 кот
   6. O-L01 разрез
+  7. REF-STYLE-A — стилевой референс, только цвет и свет
 - **Файл:** `O-SB5_varianty_A1-A4_1.png`
 - Девочка описана словами.
 
 ```text
+Image 7 is a colour-and-light reference only: match its colour grade, warmth, contrast, light quality and film texture; take nothing else from it — no people, objects, rooms, season, weather or composition; everything in the frame comes from the text and the other references.
+
 References: image 1 — the grandmother; image 2 — her knitting; image 3 — the skier; image 4 — his skis and poles; image 5 — the cat; image 6 — the cut-away of the building, for the look of the rooms.
 
 Storyboard sheet: four film stills from the same live-action TV commercial in a 2×2 grid, each still 16:9, separated by thin white gutters, with a small white label in the top-left corner of each still (A1, A2, A3, A4) and no other text.
 
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail. Interiors: lived-in flats seen straight on like a dollhouse with the front wall removed; warm lamps in the room and the deep-blue evening in the window behind; a warm practical light behind or beside each person draws a rim on the hair, soft light from the front keeps the face readable; the cut walls and floor slabs are thick and deep black. Exteriors: winter blue hour just after sunset — a deep-blue sky and blue snow, warm 3000 K windows, lamps and street lights, gentle snowfall; warm lights behind and beside people draw a rim on hair and shoulders, while soft light from the front keeps every face readable. Colour: the evening blue and the brand blues in clothes and interiors — cornflower #0F7DF5, azure #1A45D5, sky blue #66A3FF, pale ice blue #DAEEFC — against warm lamplight, with lime #ADFC30 only as small bright accents, the brightest being the grandfather's bow tie; nobody wears black.
 
 People are real, characterful and unglamorous, with natural skin texture; each face is caught in the middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; nobody looks into the lens unless stated; people around react out of sync, not together.
 

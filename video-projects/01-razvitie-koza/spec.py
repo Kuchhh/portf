@@ -6,7 +6,7 @@ from build_prompts import (FILM_SINGLE, animal_layout, board_text, person_layout
                            prop_layout_free, single_text)
 from common_md import instructions, palette_section, photostyle
 
-EXPORT = {"prompts": "Промпты_Развитие_Коза_v3.md", "storyboard": "Сториборд_Развитие_Коза_v3.md"}
+EXPORT = {"prompts": "Промпты_Развитие_Коза_v4.md", "storyboard": "Сториборд_Развитие_Коза_v4.md"}
 
 # ── Свет и цвет ролика ──
 LIGHT_EXT = (
@@ -591,11 +591,18 @@ def HEADER(palette_table, export_names=None):
     ps = photostyle()
     pal = palette_section(palette_table)
     sb = f"«{export_names['storyboard']}»" if export_names else "[`storyboard.md`](storyboard.md)"
-    return f"""# «Новосёл»: промпты для ChatGPT, v3
+    return f"""# «Новосёл»: промпты для ChatGPT, v4
 
-Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v3 от 04.10.2026: игра актёров переписана по разбору эмоций в роликах Яндекса.
+Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v4 от 04.10.2026: игра актёров по разбору эмоций (v3), цвет и фотостиль по пяти стилевым референсам дизайнера (v4).
 
 Это **набор инструкций для Claude в десктоп-приложении**: он генерирует картинки в ChatGPT через браузер дизайнера. Сценарий и раскадровка — {sb}.
+
+## Что изменилось в v4
+
+- **Цвет и фотостиль** теперь опираются на пять стилевых референсов дизайнера, REF-STYLE-A…E (раздел «Стилевые референсы»).
+  - Стиль описан словами в общем блоке каждого кадра.
+  - В фонах и раскадровке нужный кадр прикладывается последней картинкой, только как образец цвета и света.
+- Листы персонажей и предметов не менялись.
 
 ## Что изменилось в v3
 
@@ -656,3 +663,9 @@ FOOTER = """## 7. После раскадровки
 
 Следующий этап — ключевые кадры (по одному на план) и промпты Seedance 2.0 для «Виви». Это делаем отдельно, после того как дизайнер утвердит раскадровку v2 и выберет реакции.
 """
+
+
+# v4: стилевые референсы (цвет и свет)
+for _sec in SECTIONS:
+    for _it in _sec[2]:
+        _it['style'] = {'N-L01': 'REF-STYLE-B', 'N-L02': 'REF-STYLE-B', 'N-L03': 'REF-STYLE-B', 'N-L04': 'REF-STYLE-E', 'N-L05': 'REF-STYLE-A', 'N-SB1': 'REF-STYLE-B', 'N-SB2': 'REF-STYLE-C', 'N-SB3': 'REF-STYLE-D', 'N-SB4': 'REF-STYLE-E', 'N-SB5': 'REF-STYLE-B', 'N-SB6': 'REF-STYLE-B'}.get(_it['id'])

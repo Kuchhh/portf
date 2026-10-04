@@ -19,7 +19,7 @@
 ## Фотостиль кадра (раскадровка, ключевые кадры)
 
 ```text
-Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural.
+Each still is a real film frame, shot on an ARRI Alexa 35 with Cooke prime lenses and graded like a modern premium Russian TV commercial: photographic and alive, natural exposure, gentle highlight roll-off, deep but not crushed blacks, fine film grain, shallow depth of field with a soft but recognisable background, foreground layers where natural. Colour grade: warm, natural and gently contrasted — a creamy off-white and beige base with one or two saturated accents, crisp light-and-shadow shapes from the real light source falling on walls and faces, soft highlights with nothing clipped, deep shadows, real lived-in detail.
 ```
 
 ## Люди и эмоции (в каждый кадр с людьми)
