@@ -39,9 +39,10 @@ FILM = (
 )
 FILM_SINGLE = FILM.replace("Each still is", "It is")
 PEOPLE = (
-    "People are real, characterful and unglamorous, with natural skin texture; candid micro-expressions "
-    "caught in the middle of an action; nobody poses or looks into the lens unless stated; nobody smiles "
-    "unless stated, and then only a small, natural smile."
+    "People are real, characterful and unglamorous, with natural skin texture; each face is caught in the "
+    "middle of one small reaction, described below by what the brows, eyes and mouth do — never a posed "
+    "expression; the eyes react first, the mouth follows; smiles are closed-lip and small unless stated; "
+    "nobody looks into the lens unless stated; people around react out of sync, not together."
 )
 
 

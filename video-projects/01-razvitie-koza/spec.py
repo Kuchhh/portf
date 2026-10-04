@@ -6,7 +6,7 @@ from build_prompts import (FILM_SINGLE, animal_layout, board_text, person_layout
                            prop_layout_free, single_text)
 from common_md import instructions, palette_section, photostyle
 
-EXPORT = {"prompts": "Промпты_Развитие_Коза_v2.md", "storyboard": "Сториборд_Развитие_Коза_v2.md"}
+EXPORT = {"prompts": "Промпты_Развитие_Коза_v3.md", "storyboard": "Сториборд_Развитие_Коза_v3.md"}
 
 # ── Свет и цвет ролика ──
 LIGHT_EXT = (
@@ -400,12 +400,13 @@ SB1 = board_text(
         "Side view at hoof height, 50 mm lens look, only her legs from the knees down: two small dark hooves step out "
         "of deep forest snow onto the cleared grey paving of the courtyard path from image 3, walking from left to "
         "right past a low snowbank; kicked-up snow crystals lit from behind.",
-        "The courtyard from image 3 at eye level, 35 mm lens look: in the right foreground the man from image 4 in "
-        "his sky-blue parka brushes snow off the roof of the azure car from image 5 with the brush from image 6; the "
-        "brushed snow dust glows in the sun behind him. His eyes slide to the left of the camera and the brush slows "
-        "mid-stroke, lips slightly parted — mild puzzlement, no smile. Behind him, soft: the playground with wooden "
-        "towers under snow, the spruce with blue and lime baubles, two children in bright snowsuits playing, the "
-        "light-grey brick facades.",
+        "The courtyard from image 3, a medium shot from the chest up at eye level, 50 mm lens look: on the right "
+        "third of the frame the man from image 4 in his sky-blue parka brushes snow off the roof of the azure car from "
+        "image 5 with the brush from image 6; his face takes about a third of the frame height; the brushed snow dust "
+        "glows in the sun behind him. Caught mid-reaction: his eyes have just slid to the left of the camera and stay "
+        "there; the brush has stopped mid-stroke; his brows lift a little and his lips part slightly; the rest of his "
+        "face is still; no smile. Behind him, soft: the playground with wooden towers under snow, the spruce with "
+        "blue and lime baubles, two children in bright snowsuits playing, the light-grey brick facades.",
     ], LOOK_EXT)
 
 SB2 = board_text(
@@ -416,20 +417,22 @@ SB2 = board_text(
         "A ground-level insert, 85 mm lens look, very shallow depth of field: the goat's small dark hooves and slender "
         "white legs walk across the grey paving straight towards the camera; the nearest hoof is about to cover the "
         "lens; kicked-up snow crystals glow in the sun behind.",
-        "At a child's eye height in the courtyard from image 3, 50 mm lens look: a boy of about six — round rosy "
-        "cheeks, a gap-toothed grin, a cornflower-blue snowsuit, a white knitted hat with a lime pompom, lime mittens "
-        "on a string — tugs the sleeve of the mother from image 4 and points just to the left of the camera, beaming "
-        "with real delight. The mother turns her head that way: eyebrows lifted a little, lips closed, the faintest "
-        "smile only in her eyes, her gloved hands still straightening his hat. The sun behind them rims the hats and "
-        "hair; their faces are softly lit by the snow.",
+        "At a child's eye height in the courtyard from image 3, a medium close two-shot, 50 mm lens look, both faces "
+        "large in the frame: a boy of about six — round rosy cheeks, a cornflower-blue snowsuit, a white knitted hat "
+        "with a lime pompom, lime mittens on a string — tugs the sleeve of the mother from image 4 and points just to "
+        "the left of the camera; his face has opened up with real delight: eyebrows up, eyes wide and shining, a wide "
+        "gap-toothed grin. The mother, half a beat behind him, has turned her head that way: her brows lift a little "
+        "and her lower lids soften — the faintest smile only in her eyes, lips closed; her gloved hands are still "
+        "straightening his hat. The sun behind them rims the hats and hair; their faces are softly lit by the snow.",
         "A close side view at box height, 85 mm lens look: the moving box from image 2 is carried past from left to "
         "right in the goat's slender white forelegs with small dark hooves — we see only the forelegs, the box and "
         "the lime fringe of her scarf; inside, the framed goat-family photo, the small spruce in its sky-blue pot, "
         "the white enamel mug with a cornflower rim and the lime yarn ball with wooden needles sway with the step; "
         "the courtyard soft behind.",
-        "Medium-wide, 50 mm lens look: the yard keeper from image 5 in his azure work suit with lime reflective "
-        "stripes keeps pushing the shovel from image 6 while his eyes follow something to the left of the camera "
-        "with a perfectly stone face; a heap of snow grows in front of the cornflower-blue blade; sun from the side, "
+        "A medium shot from the waist up, 50 mm lens look: the yard keeper from image 5 in his azure work suit with "
+        "lime reflective stripes keeps pushing the shovel from image 6 at the same steady pace while his eyes follow "
+        "something just left of the camera; a perfectly flat, unbothered face — heavy lids, the moustache still, "
+        "nothing moves but his eyes; a heap of snow grows in front of the cornflower-blue blade; sun from the side, "
         "his face readable.",
     ], LOOK_EXT)
 
@@ -441,9 +444,10 @@ SB3 = board_text(
         "From behind at shoulder height, about 1.2 m behind the goat from image 1, 40 mm lens look, the goat centred: "
         "the back of her head with slim swept-back horns, her long elegant neck, the sleek white coat, the lime scarf "
         "end down her back, the top edge of the box she carries. Ahead, the entrance from image 2: the couple from "
-        "images 3 and 4 have just stepped out mid-conversation; they stop short and exchange a quick look — her "
-        "eyebrows go up, he stays composed and holds the door open with a small, courteous gesture; no smiles. Warm "
-        "light inside the doorway, sun from the side.",
+        "images 3 and 4 have just stepped out mid-conversation and stop short, out of sync: she has stopped mid-word, "
+        "her brows lifted, lips still parted; he, half a beat behind her, has turned his head, his face composed, "
+        "lips closed, and holds the door open with a small, courteous gesture; no smiles. Warm light inside the "
+        "doorway, sun from the side.",
         "A low side view from the knees down as the camera passes through the facade, 40 mm lens look: the left third "
         "of the frame is a dark blurred band — the cut edge of the wall right at the lens; beyond it the bright lobby "
         "from image 5 with its pale polished stone floor, light oak and pale ice-blue plaster; the goat's slender "
@@ -455,8 +459,10 @@ SB3 = board_text(
         "the bright cabin — light oak, brushed steel, soft neutral-white light — on the right stands the young man "
         "from image 6 in his cornflower puffer with a string bag of tangerines; the goat from image 1 has stepped in "
         "and turned to face us, seen whole for the first time: tall, slender and graceful, blue aviator sunglasses, "
-        "lime scarf, the box in her forelegs, a calm, self-assured look. The young man glances sideways at her in "
-        "slight bewilderment: brows a little raised and drawn together, lips slightly parted, no smile.",
+        "lime scarf, the box in her forelegs; calm and self-assured — lids a little lowered behind the blue lenses, "
+        "the corners of her mouth lifted a fraction, chin a touch up, the rest of her face still. The young man has "
+        "frozen mid-glance: his eyes turned sideways to her, brows lifted a little and drawn together, lips slightly "
+        "parted, no smile; his shoulders stiff, the string bag motionless.",
     ], LOOK_ALL)
 
 SB4 = single_text(
@@ -466,8 +472,9 @@ SB4 = single_text(
     "the open elevator (image 4) stands in the right half of the frame; inside it, full length and side by side, the "
     "tall, slender goat from image 1 — blue aviator sunglasses, lime knitted scarf, holding her moving box — and the "
     "young man from image 2 in his cornflower puffer with the string bag of tangerines. The goat nudges her "
-    "sunglasses up her muzzle with one hoof, perfectly at ease; the young man stands stiffly and glances at her "
-    "sideways in slight bewilderment, no smile. The left half of the frame is a calm, empty wall of pale ice-blue "
+    "sunglasses up her muzzle with one hoof, perfectly at ease, the corners of her mouth lifted a fraction; the "
+    "young man stands stiffly, his eyes sliding sideways to her, brows a little raised, lips pressed together, no "
+    "smile. The left half of the frame is a calm, empty wall of pale ice-blue "
     "plaster (#DAEEFC), softly washed with light from above, with nothing on it.",
     LOOK_INT)
 
@@ -481,10 +488,11 @@ SB5 = board_text(
         "shoulder has stopped; the top of the tree still sways; his eyes follow something to the left of the camera "
         "and one corner of his mouth slowly lifts — barely.",
         "On a wooden bench, 85 mm lens look: the grandmother from image 3 holds the steaming cup-lid of the thermos "
-        "from image 6; she stopped it halfway to her mouth and slowly lowers it; a soft, knowing look, eyes "
-        "crinkling, lips barely curved.",
+        "from image 6; she has stopped it halfway to her mouth; the lines around her eyes deepen in a warm, "
+        "knowing look, her lips barely curve; nothing else on her face moves.",
         "At low height on a snowy path, 50 mm lens look: the beagle from image 5 in its lime harness sits down and "
-        "tilts its head to one side; the lime leash goes slack; above it, the owner from image 4 raises one eyebrow.",
+        "tilts its head to one side; the lime leash goes slack; above it, the owner from image 4 raises one eyebrow, "
+        "the rest of her face perfectly still.",
         "On the playground swing, 50 mm lens look: a lanky boy of about fifteen with a deadpan face — azure puffer "
         "jacket, light-grey beanie, white wireless earbuds — keeps swinging, turns his head to follow something and "
         "pulls out one earbud; no smile.",
@@ -506,7 +514,8 @@ SB6 = board_text(
         "looking, the boy sticks the carrot nose into the snowman crooked.",
         "On a courtyard path, 50 mm lens look: a boy of about seven (azure snowsuit with light-grey knee patches, "
         "white knitted hat with a sky-blue stripe, cream scarf) pulling the sled from image 5 by its rope has stopped "
-        "dead, wide-eyed; the sled rolls on and bumps into the back of his legs.",
+        "dead: eyes wide, mouth a small O; the sled rolls on and bumps into the back of his legs, and he doesn't "
+        "look down.",
     ], LOOK_EXT, layout="stack")
 
 STORYBOARD = [
@@ -582,11 +591,21 @@ def HEADER(palette_table, export_names=None):
     ps = photostyle()
     pal = palette_section(palette_table)
     sb = f"«{export_names['storyboard']}»" if export_names else "[`storyboard.md`](storyboard.md)"
-    return f"""# «Новосёл»: промпты для ChatGPT, v2
+    return f"""# «Новосёл»: промпты для ChatGPT, v3
 
-Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v2 от 04.10.2026, переделана по разбору раскадровки v1.
+Ролик застройщика «Развитие» для ЖК **Суворов-Сити 2**. YouTube, 16:9, 20 секунд. Версия v3 от 04.10.2026: игра актёров переписана по разбору эмоций в роликах Яндекса.
 
 Это **набор инструкций для Claude в десктоп-приложении**: он генерирует картинки в ChatGPT через браузер дизайнера. Сценарий и раскадровка — {sb}.
+
+## Что изменилось в v3
+
+Изменилась только **раскадровка** (N-SB1…SB6). Листы персонажей, предметов и локаций остаются как в v2.
+- Эмоции записаны **движениями лица**, а не словами «улыбается», «удивлён». Правила — в `video-research/06-emotions.md`.
+- **Каждая реакция поймана посередине:** сначала глаза, потом рот. Улыбки по умолчанию с сомкнутыми губами. Большая эмоция одна — восторг мальчика.
+- **Реакции снимаем ближе:** лицо занимает около трети высоты кадра (мужчина со щёткой — по грудь, мама с мальчиком — средний крупный, дворник — по пояс). Иначе мимика не читается.
+- **Люди реагируют вразнобой:** в паре у подъезда сначала она, через полсекунды он.
+- **Коза** спокойна и уверена: веки чуть опущены, уголки рта приподняты на долю.
+- **Парень в лифте** застыл посреди взгляда: брови чуть вверх и к переносице, губы приоткрыты, плечи напряжены, без улыбки.
 
 ## Что изменилось в v2
 

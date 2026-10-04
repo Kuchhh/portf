@@ -6,7 +6,7 @@ from build_prompts import (FILM_SINGLE, animal_layout, board_text, person_layout
                            prop_layout_free, single_text)
 from common_md import instructions, palette_section, photostyle
 
-EXPORT = {"prompts": "Промпты_Развитие_Овация_v2.md", "storyboard": "Сториборд_Развитие_Овация_v2.md"}
+EXPORT = {"prompts": "Промпты_Развитие_Овация_v3.md", "storyboard": "Сториборд_Развитие_Овация_v3.md"}
 
 # ── Свет и цвет ролика ──
 LIGHT_EVE = (
@@ -294,23 +294,25 @@ SB1 = board_text(
     "her tray of pirozhki and oven mitts; image 6 — the cut-away of the whole building, showing where each room is.",
     ["1", "2", "3", "4"],
     [
-        "The living room from image 2, strictly frontal like a dollhouse, 40 mm lens look: the grandfather from image "
-        "1 sits in the caramel leather armchair, a glass of tea in a metal holder on the side table; he looks just "
-        "below the camera as if at a TV and claps slowly and solemnly, no smile. The floor lamp behind his shoulder "
+        "The living room from image 2, strictly frontal like a dollhouse, a medium shot, 40 mm lens look, his face "
+        "about a third of the frame height: the grandfather from image 1 sits upright in the caramel leather "
+        "armchair, a glass of tea in a metal holder on the side table; chin slightly lifted, a steady solemn gaze "
+        "just below the camera as if at a TV; his lips press into a straight line under the moustache; he claps "
+        "slowly and evenly; no smile. The floor lamp behind his shoulder "
         "draws a warm rim on his white hair; soft light from the TV in front keeps his face readable.",
         "Same floor, the next flat to the right: the left edge of the frame is a thick black band — the cut of the "
         "wall between the flats. The sky-blue nursery: the young mother from image 3 rocks the sleeping baby in the "
-        "sling, hears the clapping through the wall, smiles to herself and taps two fingers into her palm — a silent "
-        "applause. The night lamp beside her warms her hair; her face is softly lit.",
+        "sling; hearing the clapping through the wall, she glances at the wall — a beat later the corners of her mouth "
+        "lift a little, lips closed — and taps two fingers into her palm without a sound; the baby sleeps on. The night lamp beside her warms her hair; her face is softly lit.",
         "One floor down: the top edge of the frame is a thick black band — the cut of the floor slab. The azure "
         "teenager's room with a lime desk lamp: a lanky boy of about fifteen with messy dark-blond hair, in a "
         "cornflower-blue hoodie and big white over-ear headphones with one ear cup slid off, sits at his desk; eyes "
-        "still on the monitor, he gives two flat, deadpan claps. The monitor lights his face from the front, the lime "
+        "still on the monitor, he gives two dry claps; a perfectly flat face, nothing moves but his hands. The monitor lights his face from the front, the lime "
         "lamp rims his hair.",
         "Another floor down, a black slab band at the top: the white kitchen with the cornflower-blue tiles; the woman "
         "from image 4 holds the tray from image 5 in her sky-blue oven mitts, sets it down and claps the mitts "
-        "together; a small puff of flour glitters in the light of the pendant lamp; a restrained, proud look, lips "
-        "pressed together.",
+        "together; a small puff of flour glitters in the light of the pendant lamp; she presses her lips together to "
+        "hold back a proud smile, and the corners lift anyway.",
     ], LOOK_HOME)
 
 SB2 = board_text(
@@ -319,18 +321,18 @@ SB2 = board_text(
     ["5", "6", "7", "8"],
     [
         "The ground-floor lobby from image 2 seen frontally, 40 mm lens look: the concierge from image 1 in her azure "
-        "cardigan, behind the oak desk, taps a chrome desk bell twice and gives a small approving nod; through the "
+        "cardigan, behind the oak desk, taps a chrome desk bell twice and gives one short approving nod, lips pressed, eyes warm; through the "
         "glass entrance doors behind her, the blue winter courtyard. The right edge of the frame is a dark blurred "
         "band — the cut of the facade wall right at the lens.",
         "The car-free courtyard from image 5 at blue hour, 35 mm lens look: the man from image 3 — open "
         "cornflower-blue puffer, oatmeal sweater, grey felt boots — beats the blue-patterned carpet from image 4, laid "
         "flat on the snow, with his rattan carpet beater; snow dust rises and glitters in the warm lamp light behind "
         "him; behind, the snowy playground and towers with warm windows. A lamp in front keeps his face readable: "
-        "focused, in rhythm, a satisfied half-smile.",
+        "focused, eyes on the carpet, a satisfied half-smile just appearing at one corner of his mouth.",
         "At a child's eye height in the same courtyard, 50 mm lens look: two children of about seven face the camera "
         "and clap their mittens — a girl in a sky-blue snowsuit and a white hat with a lime pompom, with freckles and "
-        "a missing front tooth, laughing for real; a boy in a cornflower-blue snowsuit, a pale ice-blue hat and lime "
-        "mittens, grinning shyly — snow bursts off the mittens like confetti in the lamp light.",
+        "a missing front tooth, laughing for real, eyes crinkled almost shut; a boy in a cornflower-blue snowsuit, a pale ice-blue "
+        "hat and lime mittens, a beat behind her, grinning shyly — the biggest emotion of the film; snow bursts off the mittens like confetti in the lamp light.",
         "A ground-level insert, 85 mm lens look: the dog from image 6 in its lime collar sits on the snow, its plumed "
         "tail sweeping the snow from side to side like a wiper; snow sparkles in the lamplight behind it.",
     ], LOOK_ALL)
@@ -344,7 +346,7 @@ SB3 = board_text(
     [
         "The wooden bridge from image 1, tall timber slats blurred in the foreground, 50 mm lens look: the young couple "
         "from images 2 and 3 have stopped; she — pale ice-blue coat, cornflower-blue scarf — claps in her mittens and "
-        "laughs into her scarf; he — azure parka, sky-blue beanie — hands full with two grocery bags, taps the bags "
+        "laughs into her scarf, eyes crinkling; he — azure parka, sky-blue beanie — hands full with two grocery bags, taps the bags "
         "together, one eyebrow up, amused. Small warm lamps low along the railing light their faces softly from the "
         "front; the windows behind glow warm.",
         "The same shot, and at the far end of the bridge the tall, slender white goat from image 4 — blue aviator "
@@ -353,7 +355,8 @@ SB3 = board_text(
         "are lighting up one by one, floor after floor upward, the wave of warm light nearly at the top; snowflakes "
         "fly towards the lens; deep-blue sky.",
         "The grandfather's living room again, strictly frontal: the grandfather from image 6 now stands, straightening "
-        "his lime bow tie in the middle of a final clap, with a small dignified nod straight into the lens; no smile. "
+        "his lime bow tie in the middle of a final clap, chin lifting a little, with one small dignified nod straight into the lens; warmth in the eyes, "
+        "the mouth stays still, no smile. "
         "The floor lamp rims his hair, soft light keeps his face readable, the snowy blue window behind him.",
     ], LOOK_ALL)
 
@@ -446,11 +449,20 @@ def HEADER(palette_table, export_names=None):
     ps = photostyle()
     pal = palette_section(palette_table)
     sb = f"«{export_names['storyboard']}»" if export_names else "[`storyboard.md`](storyboard.md)"
-    return f"""# «Овация»: промпты для ChatGPT, v2
+    return f"""# «Овация»: промпты для ChatGPT, v3
 
-Ролик застройщика «Развитие» для **арт-квартала «Зарядье»**. YouTube, 16:9, 20 секунд, финальная фраза **«Лучший застройщик года»**. Версия v2 от 04.10.2026.
+Ролик застройщика «Развитие» для **арт-квартала «Зарядье»**. YouTube, 16:9, 20 секунд, финальная фраза **«Лучший застройщик года»**. Версия v3 от 04.10.2026: игра актёров переписана по разбору эмоций в роликах Яндекса.
 
 Это **набор инструкций для Claude в десктоп-приложении**: он генерирует картинки в ChatGPT через браузер дизайнера. Сценарий и раскадровка — {sb}.
+
+## Что изменилось в v3
+
+Изменилась только **раскадровка** (O-SB1…SB5).
+- Каждая реакция записана движениями лица, а не словами-эмоциями: что делают брови, глаза, губы. Правила — в `video-research/06-emotions.md`.
+- **Дедушка торжественный:** подбородок чуть вверх, губы в прямую линию, без улыбки. В финале он кивает в объектив, тепло только в глазах.
+- **Остальные соседи сдержанные:** у мамы уголки рта приподняты при сомкнутых губах, хозяйка сдерживает гордую улыбку, подросток с каменным лицом.
+- **Большая эмоция в ролике одна** — смех детей во дворе.
+- **Соседи хлопают вразнобой:** каждый вступает в свою долю.
 
 ## Что изменилось в v2
 

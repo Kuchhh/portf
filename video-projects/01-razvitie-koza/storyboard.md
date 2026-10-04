@@ -1,6 +1,6 @@
 # «Новосёл» — Развитие, ЖК Суворов-Сити 2
 
-Раскадровка v2, 04.10.2026: внешность козы, палитра, свет и эмоции переделаны по разбору v1 (см. «Решения дизайнера»). Почерк камеры по [`video-research/director-style.md`](../../video-research/director-style.md).
+Раскадровка v3, 04.10.2026: внешность козы, палитра и свет из v2, игра актёров переписана по разбору эмоций (раздел «Игра по кадрам»). Почерк камеры по [`video-research/director-style.md`](../../video-research/director-style.md).
 
 ## Бриф
 
@@ -85,6 +85,33 @@
 - 260-22-00 | RZV.RU;
 - полоса сноски.
 
+## Игра по кадрам (v3)
+
+Эмоции пишем движениями лица и таймингом, а не словами «улыбается» или «удивлён». Правила и словарь — в [`video-research/06-emotions.md`](../../video-research/06-emotions.md).
+- **Порядок реакции:** сначала глаза, потом рот. Улыбки по умолчанию с сомкнутыми губами.
+- **Большая эмоция одна** — восторг мальчика.
+- **Крупность:** на реакциях лицо занимает около трети высоты кадра.
+- **Кто реагирует вместе, реагирует вразнобой** на 0,3–0,5 с.
+
+| Кадр | Кто | Эмоция | Что двигается → что неподвижно | Тайминг | Фраза для Seedance |
+|---|---|---|---|---|---|
+| 4 | Мужчина со щёткой | Сдержанное удивление | глаза уходят влево от объектива, щётка останавливается, брови чуть вверх, губы приоткрыты → остальное лицо; улыбки нет | взгляд на 0,3 с, щётка тормозит за 0,5 с, лицо держит до конца плана | `His eyes slide to the left of the lens and stay there; the brush slows to a stop mid-stroke; his lips part slightly and his brows lift a little; the rest of his face stays still; no smile.` |
+| 6 | Мальчик | Детский восторг — единственная большая эмоция | брови вверх, глаза блестят, широкая улыбка, дёргает рукав, показывает | сразу | `His face opens up with real delight — eyebrows up, eyes wide and shining, a wide gap-toothed grin; he tugs his mother's sleeve twice and points just left of the lens.` |
+| 6 | Мама | Улыбка одними глазами | поворот головы, брови чуть вверх, нижние веки смягчаются → губы сомкнуты, руки поправляют шапку | на полсекунды позже мальчика | `Half a second later she turns her head that way; her brows lift a little and her lower lids soften — the faintest smile only in her eyes, lips closed; her hands keep straightening his hat.` |
+| 8 | Дворник | Каменное лицо | только глаза и одно медленное моргание → усы, рот, темп лопаты | моргание в середине плана | `He looks just left of the lens with a perfectly flat face — one slow blink, the moustache doesn't move — and keeps pushing the shovel at the same steady pace.` |
+| 9 | Пара у подъезда | Вежливое замешательство | она осеклась на полуслове, брови вверх; он поворачивает голову, придерживает дверь → без улыбок | она первая, он через 0,5 с | `They stop mid-sentence: first her brows lift, half a second later he turns his head; they exchange a quick glance, lips closed; he steps aside and holds the door with a small courteous gesture, his face composed.` |
+| 12 | Коза | Спокойная уверенность | медленное моргание за голубыми стёклами, уголки рта на долю вверх, подбородок чуть вверх → уши, морда | моргание после разворота | `Calm and self-assured: one slow blink behind the blue lenses, the corners of her mouth lift a fraction, chin slightly up; her ears and the rest of her face stay still.` |
+| 12 | Парень в лифте | Лёгкое недоумение | косится, замирает, брови чуть вверх и к переносице, губы приоткрыты → без улыбки, плечи напряжены | замирает на 0,5 с, потом едва заметный кивок | `He glances sideways at her and freezes for half a second: his brows lift a little and draw together, his lips part slightly, his eyes stay on her; no smile; then a small, uncertain nod.` |
+| 13 | Коза | То же спокойствие | поправляет очки копытцем | — | `She nudges her sunglasses up her muzzle with one hoof, perfectly at ease.` |
+| 13 | Парень | Напряжённая неловкость | взгляд скользит к ней и обратно к дверям, губы поджаты → стоит прямо | — | `He stands stiffly, his eyes sliding to her and back to the doors; lips pressed together; no smile.` |
+| R1 | Мужчина с ёлкой | Усмешка про себя | глаза провожают, один уголок рта медленно ползёт вверх → остальное | уголок за ~1 с | `His eyes follow something left of the lens; one corner of his mouth slowly lifts — barely; nothing else moves.` |
+| R2 | Бабушка | Тёплое понимание | кружка замирает на полпути, морщинки у глаз углубляются → губы едва изогнуты | — | `She stops the cup halfway, then slowly lowers it; the lines around her eyes deepen in a warm, knowing look; her lips barely curve.` |
+| R3 | Хозяйка собаки | Скепсис | одна бровь вверх → всё остальное | — | `She raises one eyebrow; nothing else on her face moves.` |
+| R4 | Подросток | Невозмутимость | поворот головы, вынимает наушник → лицо плоское | — | `Still swinging, a flat face; he turns his head to follow and pulls out one earbud; no smile.` |
+| R5 | Женщина на балконе | Замерла | застыла в движении, губы приоткрыты, брови чуть вверх | гирлянда продолжает мигать | `She freezes mid-movement, lips parted, brows up a little; the bulbs keep blinking.` |
+| R6 | Дети у снеговика | Заворожённость | рты приоткрыты; мальчик не глядя втыкает морковку криво | — | `Both stare, mouths slightly open; without looking, the boy pushes the carrot in crooked.` |
+| R7 | Мальчик с санками | Застыл | глаза круглые, рот буквой «о»; санки бьют по ногам, он не смотрит вниз | — | `He stops dead, eyes wide, mouth a small O; the sled bumps into his legs and he doesn't look down.` |
+
 ## Правила кадра (из нашего почерка и брифа)
 
 - **Направление на экране:** коза всегда движется **слева направо**. Люди смотрят **левее камеры**, в 25–40° от оси объектива, а не в объектив: коза за кадром рядом с камерой. Так зритель чувствует, где она, и не видит её.
@@ -133,3 +160,4 @@
 - **Парень в лифте — лёгкое недоумение без улыбки** (образец — кадр с парнем в очках).
 - **Ошибки v1 исправлены в промптах:** фото в коробке — семья коз; на вставке 7 коробку несёт коза.
 - Промпты v2: [`gpt-prompts.md`](gpt-prompts.md).
+- **v3 (04.10.2026):** игра актёров переписана по разбору эмоций, см. «Игра по кадрам». Реакции сняты ближе (лицо ≈ треть кадра), сначала глаза, потом рот, реакции вразнобой.

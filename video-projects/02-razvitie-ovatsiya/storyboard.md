@@ -1,6 +1,6 @@
 # «Овация» — Развитие, арт-квартал «Зарядье»
 
-Сценарий и раскадровка v2, 04.10.2026: палитра, свет и эмоции поправлены по разбору раскадровки «Новосёла». Почерк камеры по [`video-research/director-style.md`](../../video-research/director-style.md): тот же режиссёр, что и у «Новосёла», но другое место, другой сюжет и другое время суток.
+Сценарий и раскадровка v3, 04.10.2026: палитра и свет из v2, игра актёров переписана по разбору эмоций (раздел «Игра по кадрам»). Почерк камеры по [`video-research/director-style.md`](../../video-research/director-style.md): тот же режиссёр, что и у «Новосёла», но другое место, другой сюжет и другое время суток.
 
 Промпты для ChatGPT (листы и раскадровка): [`gpt-prompts.md`](gpt-prompts.md).
 
@@ -115,6 +115,25 @@
 - **A2. Лыжник в парке квартала** (вместо 7 или 9). Подтянутый мужчина ~60 останавливается на лыжне между берёзами и стучит палками над головой.
 - **A3. Девочка со скрипкой** (вместо 3). Девочка ~9 у пюпитра играет короткий торжественный туш, зажмурившись от старания.
 - **A4. Кот на подоконнике** (вместо 2). Серый полосатый кот лежит на подоконнике с полузакрытыми глазами и стучит хвостом в такт.
+
+## Игра по кадрам (v3)
+
+Эмоции пишем движениями лица и таймингом. Словарь — в [`video-research/06-emotions.md`](../../video-research/06-emotions.md).
+- **Хлопки вразнобой:** каждый сосед вступает в свою долю.
+- **Большая эмоция одна** — смех детей.
+- **Дедушка без улыбки:** вся его теплота в глазах и кивке.
+
+| Кадр | Кто | Эмоция | Фраза для Seedance |
+|---|---|---|---|
+| 1 | Дедушка | Торжественность | `He sits upright, chin slightly lifted, a steady solemn gaze just below the lens; his lips press into a straight line under the moustache; he sets the glass down and claps slowly and evenly; no smile.` |
+| 2 | Мама | Тихая улыбка про себя | `She hears the clapping through the wall; the corners of her mouth lift a little as she glances at the wall, and she taps two fingers into her palm without a sound; the baby sleeps on.` |
+| 3 | Подросток | Невозмутимость | `His eyes never leave the screen; a perfectly flat face; he slides one ear cup off, gives two dry claps and puts it back.` |
+| 4 | Хозяйка | Сдержанная гордость | `She presses her lips together to hold back a proud smile — the corners lift anyway — and claps the oven mitts twice; a puff of flour.` |
+| 5 | Консьерж | Одобрение | `She taps the bell twice and gives one short approving nod, lips pressed, eyes warm.` |
+| 6 | Мужчина с ковром | Сосредоточенный азарт | `Focused, he beats the carpet in rhythm; on the third stroke a satisfied half-smile appears.` |
+| 7 | Дети | Смех от души — единственная большая эмоция | `They laugh for real — eyes crinkle, mouths open — and clap their mittens a beat apart.` |
+| 9 | Пара на мосту | Веселье и ирония | `She laughs into her scarf, eyes crinkling; he lifts one eyebrow, amused, and knocks the bags together twice.` |
+| 11 | Дедушка стоя | Достоинство | `He rises, straightens the bow tie, one last clap; his chin lifts a little and he gives one small dignified nod into the lens — warmth in the eyes, the mouth stays still.` |
 
 ## Правила кадра
 
