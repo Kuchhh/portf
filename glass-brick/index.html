@@ -203,6 +203,7 @@
     <div class="media" id="modalMedia"></div>
     <p class="hint" id="modalHint"></p>
     <div class="file-row"><a class="btn" id="modalDownload" href="#">Скачать</a></div>
+    <p class="hint" id="modalStatus" role="status"></p>
   </div>
 </div>
 
@@ -1032,19 +1033,45 @@ void main() {
   const media = document.getElementById('modalMedia');
   const hint = document.getElementById('modalHint');
   const dl = document.getElementById('modalDownload');
-  let lastUrl = null;
-  function openModal(title, el, url, filename, hintText) {
+  const statusEl = document.getElementById('modalStatus');
+  let lastUrl = null, currentBlob = null, currentName = '', dlCap = null;
+  if (window.claude && typeof window.claude.use === 'function') {
+    window.claude.use('downloads').then(ns => { dlCap = ns; }).catch(() => {});
+  }
+  const SAVE_ERRORS = {
+    declined: 'Сохранение отменено.',
+    rate_limited: 'Окно сохранения уже открыто. Закройте его и нажмите «Скачать» ещё раз.',
+    too_large: 'Файл слишком большой для сохранения здесь. Поставьте качество ниже в разделе «Вывод».'
+  };
+  dl.addEventListener('click', async e => {
+    if (!currentBlob) { e.preventDefault(); return; }
+    if (!dlCap) return; // outside the Claude viewer the plain link does the job
+    e.preventDefault();
+    statusEl.textContent = '';
+    try {
+      await dlCap.save({ filename: currentName, data: currentBlob });
+      statusEl.textContent = 'Файл передан на сохранение.';
+    } catch (err) {
+      statusEl.textContent = SAVE_ERRORS[err && err.code] || 'Сохранить не получилось. Нажмите на превью правой кнопкой и выберите «Сохранить».';
+    }
+  });
+  function openModal(title, el, url, filename, hintText, blob) {
     document.getElementById('modalTitle').textContent = title;
     media.replaceChildren(el);
     hint.textContent = hintText;
+    statusEl.textContent = '';
+    currentBlob = blob || null;
+    currentName = filename;
     dl.href = url;
     dl.download = filename;
+    dl.hidden = !blob;
     modal.hidden = false;
     document.getElementById('modalClose').focus();
   }
   function closeModal() {
     modal.hidden = true;
     media.replaceChildren();
+    currentBlob = null;
     if (lastUrl) { URL.revokeObjectURL(lastUrl); lastUrl = null; }
   }
   document.getElementById('modalClose').addEventListener('click', closeModal);
@@ -1060,7 +1087,7 @@ void main() {
       img.src = lastUrl;
       img.alt = 'Снимок стеклянного кирпича';
       openModal('Снимок PNG', img, lastUrl, 'steklyanny-kirpich.png',
-        `${canvas.width} × ${canvas.height} px. Если кнопка «Скачать» не срабатывает, нажмите на картинку правой кнопкой или долгим касанием и выберите «Сохранить изображение».`);
+        `${canvas.width} × ${canvas.height} px. Если фон выключен, у PNG прозрачный фон.`, blob);
     }, 'image/png');
   });
 
@@ -1090,7 +1117,7 @@ void main() {
       v.src = lastUrl; v.controls = true; v.loop = true; v.muted = true; v.playsInline = true; v.autoplay = true;
       const ext = type.includes('mp4') ? 'mp4' : 'webm';
       openModal('Видео', v, lastUrl, 'steklyanny-kirpich.' + ext,
-        `${canvas.width} × ${canvas.height} px, 6 секунд, ${ext.toUpperCase()}. Если кнопка «Скачать» не срабатывает, нажмите на видео правой кнопкой и выберите «Сохранить видео».`);
+        `${canvas.width} × ${canvas.height} px, 6 секунд, ${ext.toUpperCase()}.`, blob);
     };
     recording = true;
     videoBtn.disabled = true;
