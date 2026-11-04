@@ -890,25 +890,32 @@ void main() {
             [t * x * z - s * y, t * y * z + s * x, t * z * z + c]];
   }
   function frameAspect() { return canvas.width / Math.max(1, canvas.height); }
-  // every brick falls in its own column, at its own speed, tumbling around its own axis
+  // ---- falling bricks: simple rigid bodies that bump into each other instead of passing through ----
+  const sub3 = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+  const add3 = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+  const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+  const cross3 = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+  function overlapsAny(b, x, y, r) {
+    return fall.some(o => o !== b && o.p && Math.hypot(o.p[0] - x, o.p[1] - y) < (o.r + r) * 0.85);
+  }
   function spawnBrick(b, yStart) {
     const A = frameAspect();
-    const k = 0.8 + Math.random() * 0.4;
-    const r = boundRadius() * (state.objectSize / 100) * k;
+    const s = state.objectSize / 100;
+    const k = 0.85 + Math.random() * 0.3;
+    const r = boundRadius() * s * k;
     const half = Math.max(0, (A - r * 0.6) * state.spread);
-    let x = 0;
-    for (let tries = 0; tries < 8; tries++) {
+    let x = 0, y = yStart != null ? yStart : 1 + r + 0.15 + Math.random() * 0.4;
+    for (let tries = 0; tries < 16; tries++) {
       x = (Math.random() * 2 - 1) * half;
-      const crowded = fall.some(o => o !== b && o.y > 0.4 && Math.abs(o.x - x) < r * 1.6);
-      if (!crowded) break;
+      if (!overlapsAny(b, x, y, r)) break;
+      if (yStart == null && tries % 4 === 3) y += r * 0.6; // a crowded top: start a little higher
     }
+    const term = (0.75 + Math.random() * 0.5) * 0.6;
+    const axis = randomAxis();
+    const spin = (50 + Math.random() * 110) * (Math.random() < 0.5 ? -1 : 1) * Math.PI / 180;
     Object.assign(b, {
-      x, y: yStart != null ? yStart : 1 + r + 0.15 + Math.random() * 0.6,
-      z: (Math.random() * 2 - 1) * 0.5, k,
-      vy: 0.75 + Math.random() * 0.5,
-      axis: randomAxis(), ang: Math.random() * 360,
-      spin: (50 + Math.random() * 110) * (Math.random() < 0.5 ? -1 : 1),
-      R0: axisAngle(randomAxis(), Math.random() * 360),
+      p: [x, y, (Math.random() * 2 - 1) * 0.35], v: [0, -term, 0], term,
+      w: axis.map(c => c * spin), O: axisAngle(randomAxis(), Math.random() * 360), k, r,
       sign: [Math.random() < 0.5 ? -1 : 1, Math.random() < 0.5 ? -1 : 1, Math.random() < 0.5 ? -1 : 1]
     });
     return b;
@@ -916,33 +923,97 @@ void main() {
   function initFall() {
     fall = [];
     const n = state.count | 0;
-    for (let i = 0; i < n; i++) fall.push(spawnBrick({}, null));
-    // spread the first wave over the whole height so the frame is never empty
-    fall.forEach((b, i) => { b.y = 1.25 - (i + 0.2 + Math.random() * 0.6) * (2.6 / n); });
+    // the first wave is spread over the whole height so the frame is never empty
+    for (let i = 0; i < n; i++) fall.push(spawnBrick({}, 1.25 - (i + 0.2 + Math.random() * 0.6) * (2.6 / n)));
     dirty = true;
   }
-  function stepFall(dt) {
-    const v = state.rotationSpeed * 6;
-    const s = state.objectSize / 100;
-    for (const b of fall) {
-      b.y -= v * b.vy * dt;
-      b.ang += b.spin * state.rotationSpeed * 10 * dt;
-      const r = boundRadius() * s * b.k;
-      if (b.y < -1 - r - 0.15) spawnBrick(b, null);
+  function orthonormalize(M) {
+    let x = [M[0][0], M[1][0], M[2][0]], y = [M[0][1], M[1][1], M[2][1]];
+    const lx = Math.hypot(...x); x = x.map(c => c / lx);
+    const d = dot3(x, y); y = y.map((c, i) => c - d * x[i]);
+    const ly = Math.hypot(...y); y = y.map(c => c / ly);
+    const z = cross3(x, y);
+    for (let i = 0; i < 3; i++) { M[i][0] = x[i]; M[i][1] = y[i]; M[i][2] = z[i]; }
+  }
+  // oriented-box collision (separating axis test): exact overlap depth and the axis to push along
+  function boxOf(b, s) {
+    const H = halfExtents(), sc = s * b.k;
+    return { c: b.p, u: [0, 1, 2].map(i => [b.O[0][i], b.O[1][i], b.O[2][i]]), e: H.map(h => h * sc) };
+  }
+  function boxOverlap(A, B) {
+    const axes = [...A.u, ...B.u];
+    for (const ua of A.u) for (const ub of B.u) {
+      const c = cross3(ua, ub), l = Math.hypot(...c);
+      if (l > 1e-4) axes.push(c.map(v => v / l));
+    }
+    const d = sub3(B.c, A.c);
+    let best = null;
+    for (const L of axes) {
+      const rA = A.e.reduce((t, e, i) => t + e * Math.abs(dot3(A.u[i], L)), 0);
+      const rB = B.e.reduce((t, e, i) => t + e * Math.abs(dot3(B.u[i], L)), 0);
+      const dist = dot3(d, L), pen = rA + rB - Math.abs(dist);
+      if (pen <= 0) return null;
+      if (!best || pen < best.pen) best = { pen, n: dist < 0 ? L.map(v => -v) : L };
+    }
+    return best;
+  }
+  function support(Bx, dir) {
+    return Bx.u.reduce((p, u, i) => add3(p, u.map(v => v * Bx.e[i] * Math.sign(dot3(u, dir) || 1))), Bx.c.slice());
+  }
+  function collide(s) {
+    const e = 0.35;
+    for (let i = 0; i < fall.length; i++) for (let j = i + 1; j < fall.length; j++) {
+      const A = fall[i], B = fall[j];
+      const sa = s * A.k, sb = s * B.k;
+      if (Math.hypot(...sub3(A.p, B.p)) > (A.r + B.r)) continue;
+      const bxA = boxOf(A, s), bxB = boxOf(B, s);
+      const hit = boxOverlap(bxA, bxB);
+      if (!hit) continue;
+      const n = hit.n;
+      const pa = support(bxA, n), pb = support(bxB, n.map(v => -v));
+      const best = { pen: hit.pen };
+      const P = pa.map((c, k) => (c + pb[k]) / 2);
+      const rA = sub3(P, A.p), rB = sub3(P, B.p);
+      const vn = dot3(sub3(add3(B.v, cross3(B.w, rB)), add3(A.v, cross3(A.w, rA))), n);
+      const mA = A.k ** 3, mB = B.k ** 3, IA = mA * 0.35 * sa * sa, IB = mB * 0.35 * sb * sb;
+      if (vn < 0) {
+        const cA = cross3(rA, n), cB = cross3(rB, n);
+        const imp = -(1 + e) * vn / (1 / mA + 1 / mB + dot3(cA, cA) / IA + dot3(cB, cB) / IB);
+        for (let k = 0; k < 3; k++) {
+          A.v[k] -= imp * n[k] / mA; B.v[k] += imp * n[k] / mB;
+          A.w[k] -= cA[k] * imp / IA; B.w[k] += cB[k] * imp / IB;
+        }
+      }
+      const corr = best.pen * 0.9 + 0.002;
+      for (let k = 0; k < 3; k++) { A.p[k] -= n[k] * corr * mB / (mA + mB); B.p[k] += n[k] * corr * mA / (mA + mB); }
     }
   }
-  function manualMatrix() {
-    const r = Math.PI / 180;
-    const cx = Math.cos(state.rotX * r), sx = Math.sin(state.rotX * r);
-    const cy = Math.cos(state.rotY * r), sy = Math.sin(state.rotY * r);
-    const cz = Math.cos(state.rotZ * r), sz = Math.sin(state.rotZ * r);
-    return mul(mul([[1, 0, 0], [0, cx, -sx], [0, sx, cx]], [[cy, 0, sy], [0, 1, 0], [-sy, 0, cy]]), [[cz, -sz, 0], [sz, cz, 0], [0, 0, 1]]);
+  function stepFall(dt) {
+    const T = dt * state.rotationSpeed / 0.1;
+    const steps = Math.max(1, Math.ceil(T / 0.012)), h = T / steps;
+    const s = state.objectSize / 100;
+    for (let it = 0; it < steps; it++) {
+      for (const b of fall) {
+        b.v[1] += (-b.term - b.v[1]) * Math.min(1, h * 1.2);
+        const drag = Math.exp(-0.6 * h);
+        b.v[0] *= drag; b.v[2] *= drag;
+        b.v[2] -= b.p[2] * 1.5 * h; // a soft spring keeps bricks close to the poster plane
+        for (let k = 0; k < 3; k++) b.p[k] += b.v[k] * h;
+        let wl = Math.hypot(...b.w);
+        if (wl > 6) { b.w = b.w.map(c => c * 6 / wl); wl = 6; }
+        if (wl > 1e-6) b.O = mul(axisAngle(b.w.map(c => c / wl), wl * h * 180 / Math.PI), b.O);
+      }
+      collide(s);
+    }
+    for (const b of fall) {
+      orthonormalize(b.O);
+      if (b.p[1] < -1 - b.r - 0.15) spawnBrick(b, null);
+    }
   }
   function sceneBricks() {
     const s = state.objectSize / 100;
     if (state.animationPattern === 'fall') {
-      const base = manualMatrix();
-      return fall.map(b => ({ p: [b.x, b.y, b.z], M: mul(mul(axisAngle(b.axis, b.ang), b.R0), base), s: s * b.k, sign: b.sign }));
+      return fall.map(b => ({ p: b.p, M: b.O, s: s * b.k, sign: b.sign }));
     }
     const floatY = state.animationPattern === 'float' ? Math.sin(floatT) * 0.18 : 0;
     return [{ p: [state.posX, state.posY + floatY, 0], M: rotationMatrix(), s, sign: [1, 1, 1] }];
