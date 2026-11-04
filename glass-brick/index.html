@@ -165,6 +165,7 @@
     </div>
     <div class="actions">
       <button type="button" id="resetBtn">Сбросить</button>
+      <button type="button" id="copyBtn">Скопировать настройки</button>
       <button type="button" id="pngBtn">Снимок PNG</button>
       <button type="button" class="primary" id="videoBtn">Видео 6 с</button>
     </div>
@@ -1166,6 +1167,24 @@ void main() {
   document.getElementById('modalClose').addEventListener('click', closeModal);
   modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) closeModal(); });
+
+  const copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', () => {
+    const text = JSON.stringify(Object.assign({ aspect: document.getElementById('aspectSel').value }, state));
+    const fallback = () => {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.readOnly = true; ta.rows = 8;
+      ta.style.cssText = 'width:100%;font:12px/1.4 var(--f-mono);background:var(--bg);color:var(--ink);border:0;padding:10px;resize:vertical';
+      openModal('Настройки', ta, '#', '', 'Текст выделен: скопируйте его и перешлите в чат.', null);
+      ta.focus(); ta.select();
+    };
+    try {
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtn.textContent = 'Скопировано';
+        setTimeout(() => { copyBtn.textContent = 'Скопировать настройки'; }, 1600);
+      }, fallback);
+    } catch (e) { fallback(); }
+  });
 
   document.getElementById('pngBtn').addEventListener('click', () => {
     draw(2);
