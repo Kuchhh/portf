@@ -273,6 +273,12 @@
     const saved = JSON.parse(localStorage.getItem(STORE_KEY) || 'null');
     if (saved && typeof saved === 'object') {
       for (const k in saved) if (k in DEFAULTS) state[k] = saved[k];
+    } else {
+      // first open after the falling update: keep the brick and glass settings tuned in the earlier version
+      const old = JSON.parse(localStorage.getItem('glass-brick-v1') || 'null');
+      const KEEP = ['brickType', 'format', 'chips', 'surface', 'edgeRadius', 'seed', 'ior', 'magnification', 'dispersion',
+        'rainbowIntensity', 'tint', 'tintAmount', 'roughness', 'reflectivity', 'quality'];
+      if (old && typeof old === 'object') KEEP.forEach(k => { if (k in old) state[k] = old[k]; });
     }
   } catch (e) { /* storage unavailable */ }
   let saveTimer = 0;
