@@ -1,0 +1,5 @@
+__pycache__/
+*.tmp
+# local builds of the site; the published copy lives in the repository root
+web/index.html
+web/draws.json
