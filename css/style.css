@@ -1,0 +1,519 @@
+@font-face {
+  font-family: "Machina Inktrap";
+  src: url("../assets/fonts/PPNeueMachina-InktrapUltrabold.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Machina Inktrap";
+  src: url("../assets/fonts/PPNeueMachina-InktrapUltraboldItalic.woff2") format("woff2");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Machina Plain";
+  src: url("../assets/fonts/PPNeueMachina-PlainRegularItalic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Макет нарисован в 1440×810, --u — один пиксель макета при текущей ширине окна */
+:root {
+  --u: calc(100vw / 1440);
+
+  --bg: #becddf;
+  --feed-bg: #ffffff;
+  --menu-bg: #838f73;
+  --menu-bar: #f07ee2;
+  --menu-text: #7aff6c;
+  --menu-active: #982527;
+  --topbar-bg: #7d939c;
+  --topbar-text: #becddf;
+  --accent: #ff7df3;
+  --accent-text: #fff5fe;
+
+  --gutter: calc(23 * var(--u));
+  --panel-top: calc(13 * var(--u));
+  --panel-w: calc(690 * var(--u));
+  --panel-h: calc(100vh - 23 * var(--u));
+  --feed-h: var(--panel-h);
+  --menu-h: var(--panel-h);
+  /* Где начинается барабан в меню: на десктопе плашка с именем лежит поверх него */
+  --drum-top: 0px;
+  --panel-radius: calc(15 * var(--u));
+  --img-gap: calc(4.8 * var(--u));
+  --img-radius: calc(11 * var(--u));
+
+  --ease: cubic-bezier(0.22, 0.8, 0.2, 1);
+  --expand-time: 0.55s;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg);
+  font-family: "Machina Inktrap", system-ui, sans-serif;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Шапка — плашка внутри правого меню, поверх списка проектов */
+
+.topbar {
+  position: absolute;
+  z-index: 1;
+  top: calc(12 * var(--u));
+  left: calc(45 * var(--u));
+  width: calc(600 * var(--u));
+  height: calc(64 * var(--u));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 calc(6.35 * var(--u)) 0 calc(26.1 * var(--u));
+  border-radius: calc(123 * var(--u));
+  background: var(--topbar-bg);
+}
+
+.topbar-title {
+  width: calc(356.5 * var(--u));
+  margin: 0;
+  font-family: "Machina Plain", system-ui, sans-serif;
+  font-style: italic;
+  font-size: calc(18 * var(--u));
+  line-height: normal;
+  color: var(--topbar-text);
+  white-space: pre-wrap;
+}
+
+.contacts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: calc(122.8 * var(--u));
+  height: calc(54 * var(--u));
+  padding: calc(15 * var(--u)) calc(10 * var(--u)) calc(11 * var(--u));
+  border-radius: calc(46 * var(--u));
+  background: var(--accent);
+  color: var(--accent-text);
+  font-style: italic;
+  font-weight: 800;
+  font-size: calc(19 * var(--u));
+  text-decoration: none;
+  transition: filter 0.2s;
+}
+
+.contacts:hover {
+  filter: brightness(1.06);
+}
+
+/* Лента работ */
+
+.feed {
+  position: fixed;
+  z-index: 1;
+  top: var(--panel-top);
+  left: var(--gutter);
+  width: var(--panel-w);
+  height: var(--feed-h);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: var(--img-gap);
+  border-radius: var(--panel-radius);
+  background: var(--feed-bg);
+  cursor: zoom-in;
+  outline: none;
+  transition:
+    top var(--expand-time) var(--ease),
+    left var(--expand-time) var(--ease),
+    width var(--expand-time) var(--ease),
+    height var(--expand-time) var(--ease),
+    border-radius var(--expand-time) var(--ease);
+}
+
+.feed::-webkit-scrollbar {
+  display: none;
+}
+
+.feed:focus-visible {
+  box-shadow: 0 0 0 calc(3 * var(--u)) var(--accent);
+}
+
+/* Пока панель развёрнута или сворачивается, она лежит поверх шапки и меню */
+.feed.is-expanded,
+.feed.is-collapsing {
+  z-index: 4;
+}
+
+.feed.is-expanded {
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  border-radius: 0;
+  cursor: zoom-out;
+}
+
+.feed-project {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--img-gap);
+}
+
+.feed-project[hidden] {
+  display: none;
+}
+
+.feed-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--img-radius);
+}
+
+.feed-img.is-full {
+  grid-column: 1 / -1;
+}
+
+/* Ряд из работ разной формы: ширина каждой пропорциональна её соотношению сторон
+   (--ratio в разметке), поэтому высоты совпадают */
+.feed-row {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--img-gap);
+}
+
+.feed-row > .feed-img {
+  flex: var(--ratio) 1 0;
+  min-width: 0;
+}
+
+/* Две колонки разного состава (например, 9:16 + 1:1 слева и 1:1 + 9:16 справа):
+   колонки одной ширины, поэтому их высоты совпадают */
+.feed-cols {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--img-gap);
+}
+
+.feed-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--img-gap);
+  min-width: 0;
+}
+
+/* Живой блок на canvas вместо видео: размер задаёт aspect-ratio */
+.feed-canvas {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--aspect, 1);
+}
+
+.feed-canvas > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Проект с классом is-seamless: работы стык в стык, одной колонкой
+   со скруглением только снаружи */
+.feed-project.is-seamless {
+  gap: 0;
+}
+
+.feed-project.is-seamless > .feed-img {
+  border-radius: 0;
+}
+
+.feed-project.is-seamless > :first-child {
+  border-radius: var(--img-radius) var(--img-radius) 0 0;
+}
+
+.feed-project.is-seamless > :last-child {
+  border-radius: 0 0 var(--img-radius) var(--img-radius);
+}
+
+/* Текст о проекте между работами: на всю ширину ленты, строка не длиннее ~90 знаков */
+.feed-text {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: max(calc(36 * var(--u)), 24px);
+  padding: max(calc(40 * var(--u)), 20px) max(calc(32 * var(--u)), 12px);
+  font-family: system-ui, "Segoe UI", Arial, sans-serif;
+  font-size: max(calc(14 * var(--u)), 13px);
+  line-height: 1.75;
+  color: #6b6b6b;
+}
+
+.feed-text > div {
+  max-width: 62em;
+}
+
+.feed-text p {
+  margin: 0 0 1em;
+}
+
+.feed-text p:last-child {
+  margin-bottom: 0;
+}
+
+.feed-text .feed-text-lang {
+  margin-bottom: 0.25em;
+}
+
+.feed-text-title {
+  margin: 0 0 0.3em;
+  font-size: 1.6em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Блок, где картинка следует за курсором. Размеры и фон — как у видео,
+   которое он заменил: кадр 760×1150, обложка 440px по центру */
+.cursor-follow {
+  position: relative;
+  aspect-ratio: 760 / 1150;
+  overflow: hidden;
+  background: #e5e5e5;
+}
+
+.cursor-follow img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(440 / 760 * 100%);
+  height: auto;
+  /* Смещение от центра выставляет main.js */
+  transform: translate(-50%, -50%) translate(var(--follow-x, 0px), var(--follow-y, 0px));
+  pointer-events: none;
+  will-change: transform;
+}
+
+.feed-empty {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  color: var(--menu-bg);
+  font-size: calc(32 * var(--u));
+}
+
+.feed-empty[hidden] {
+  display: none;
+}
+
+/* Меню проектов */
+
+.menu {
+  position: fixed;
+  z-index: 1;
+  top: var(--panel-top);
+  left: calc(727 * var(--u));
+  width: var(--panel-w);
+  height: var(--menu-h);
+  overflow: hidden;
+  border-radius: var(--panel-radius);
+  background: var(--menu-bg);
+}
+
+.menu-bar {
+  position: absolute;
+  top: calc(50% + var(--drum-top) / 2);
+  left: 0;
+  right: 0;
+  height: calc(79 * var(--u));
+  transform: translateY(calc(-50% + 1.5 * var(--u)));
+  background: var(--menu-bar);
+}
+
+/* Плашка в координатах списка: 79px высотой, сдвинута на 1.5px вниз от центра */
+.menu {
+  --band-top: calc(50% - 38 * var(--u));
+  --band-bottom: calc(50% + 41 * var(--u));
+}
+
+/* Барабан как в iOS: пункты лежат на цилиндре, его ось — горизонталь через центр плашки.
+   Геометрию цилиндра считает main.js. */
+.menu-list {
+  position: absolute;
+  top: var(--drum-top);
+  right: 0;
+  bottom: 0;
+  left: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  scroll-snap-type: y mandatory;
+  overscroll-behavior: contain;
+  /* Внутри плашки этот слой не виден — там рисуется копия в цвете выбранного пункта */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 var(--band-top),
+    transparent var(--band-top),
+    transparent var(--band-bottom),
+    #000 var(--band-bottom)
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--band-top),
+    transparent var(--band-top),
+    transparent var(--band-bottom),
+    #000 var(--band-bottom)
+  );
+}
+
+/* Копия списка, видимая только внутри плашки. Прокрутку ей выставляет main.js,
+   так что буква, наполовину въехавшая в плашку, наполовину перекрашивается. */
+.menu-focus {
+  position: absolute;
+  inset: var(--drum-top) 0 0 0;
+  pointer-events: none;
+  clip-path: inset(var(--band-top) 0 calc(100% - var(--band-bottom)) 0);
+}
+
+.menu-list.is-focus {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  scroll-snap-type: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.menu-list.is-focus .menu-item {
+  color: var(--menu-active);
+  opacity: 1;
+}
+
+.menu-list::-webkit-scrollbar {
+  display: none;
+}
+
+.menu-list ul {
+  margin: 0;
+  /* Отступы сверху и снизу дают поставить в центр и первый, и последний пункт */
+  padding: calc((var(--menu-h) - var(--drum-top) - 73.28 * var(--u)) / 2) 0;
+  list-style: none;
+}
+
+.menu-list li {
+  scroll-snap-align: center;
+}
+
+.menu-item {
+  display: block;
+  width: 100%;
+  height: calc(73.28 * var(--u));
+  padding-top: calc(8 * var(--u));
+  font-weight: 800;
+  font-size: calc(56.67 * var(--u));
+  line-height: calc(73.28 * var(--u));
+  text-align: center;
+  color: var(--menu-text);
+  /* Положение на цилиндре и яркость выставляет main.js на каждом кадре прокрутки */
+  transform: var(--drum-transform, none);
+  /* Поворачиваем вокруг середины заглавных букв: они сидят на 2.64px ниже центра кнопки */
+  transform-origin: 50% calc(50% + 2.64 * var(--u));
+  opacity: var(--drum-opacity, 1);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Под курсором дальний пункт снова становится ярким. На тачскрине
+   :hover залипает после касания, поэтому только для мыши. */
+@media (hover: hover) {
+  .menu-item:hover {
+    opacity: 1;
+  }
+}
+
+.menu-item:focus-visible {
+  outline: calc(2 * var(--u)) solid var(--accent-text);
+  outline-offset: calc(-4 * var(--u));
+}
+
+/* Телефон и узкое окно: лента сверху, меню снизу на четверть экрана,
+   плашка с именем и контактами — поверх верха ленты.
+   Масштаб --u подбираем так, чтобы в барабане помещалось около пяти строк
+   и меню не вылезало за ширину экрана. */
+@media (max-width: 767px), (max-aspect-ratio: 4/5) {
+  :root {
+    --gutter: 8px;
+    --panel-top: 8px;
+    --panel-w: calc(100vw - 2 * var(--gutter));
+    --feed-h: calc(75vh - 1.5 * var(--gutter));
+    --feed-h: calc(75dvh - 1.5 * var(--gutter));
+    --menu-h: calc(25vh - 1.5 * var(--gutter));
+    --menu-h: calc(25dvh - 1.5 * var(--gutter));
+    --u: min(var(--panel-w) / 690, var(--menu-h) / 377);
+    --panel-radius: 14px;
+    --img-gap: 4px;
+    --img-radius: 8px;
+  }
+
+  .menu {
+    top: auto;
+    bottom: var(--gutter);
+    left: var(--gutter);
+  }
+
+  /* Плашка в разметке лежит внутри меню, но fixed выводит её из меню
+     наверх ленты. Развёрнутая лента (z-index 4) её перекрывает. */
+  .topbar {
+    position: fixed;
+    top: calc(var(--panel-top) + 8px);
+    left: calc(var(--gutter) + 8px);
+    right: calc(var(--gutter) + 8px);
+    width: auto;
+    gap: 8px;
+    padding-left: max(calc(26.1 * var(--u)), 12px);
+  }
+
+  .topbar-title {
+    width: auto;
+    font-size: max(calc(18 * var(--u)), 11px);
+  }
+
+  .contacts {
+    flex: none;
+    width: auto;
+    padding: 0 max(calc(18 * var(--u)), 12px);
+    font-size: max(calc(19 * var(--u)), 12px);
+  }
+
+  .feed-empty {
+    font-size: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --expand-time: 0s;
+  }
+}
