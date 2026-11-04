@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Builds the web version: draws.json from the archive, precomputed results, and index.html.
-   Usage: node web/build.js            (after `python gosloto645.py update`) */
+   Usage: node web/build.js [--out DIR]   (after `python gosloto645.py update`; DIR defaults to web/) */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -8,6 +8,8 @@ const Lotto = require('./engine.js');
 
 const WEB = __dirname;
 const CSV = path.join(WEB, '..', 'draws_6x45.csv');
+const at = process.argv.indexOf('--out');
+const OUT = at > 0 && process.argv[at + 1] ? path.resolve(process.argv[at + 1]) : WEB;
 
 function readCsv(file) {
   const lines = fs.readFileSync(file, 'utf8').trim().split(/\r?\n/);
@@ -26,7 +28,9 @@ function readCsv(file) {
 
 (async () => {
   const rows = readCsv(CSV);
-  fs.writeFileSync(path.join(WEB, 'draws.json'), JSON.stringify({ rows }));
+  fs.mkdirSync(OUT, { recursive: true });
+  // one draw per line, so an update only appends lines
+  fs.writeFileSync(path.join(OUT, 'draws.json'), '{"rows":[\n' + rows.map((r) => JSON.stringify(r)).join(',\n') + '\n]}\n');
   const draws = Lotto.parseDraws(rows);
   const t0 = Date.now();
   const result = Lotto.analyze(draws, { tickets: 10 });
@@ -35,12 +39,13 @@ function readCsv(file) {
   const t2 = Date.now();
   result.backtest = bt;
   result.built = new Date().toISOString().slice(0, 16).replace('T', ' ');
-  process.stderr.write(`analyze ${t1 - t0} ms, backtest ${t2 - t1} ms\n`);
+  process.stderr.write(`draws ${rows.length}, last №${rows[rows.length - 1][0]}; analyze ${t1 - t0} ms, backtest ${t2 - t1} ms\n`);
   const engine = fs.readFileSync(path.join(WEB, 'engine.js'), 'utf8');
   const app = fs.readFileSync(path.join(WEB, 'app.html'), 'utf8');
   const html = app
     .replace('/*@ENGINE@*/', () => engine)
     .replace('/*@INIT@*/', () => JSON.stringify(result).replace(/</g, '\\u003c'));
-  fs.writeFileSync(path.join(WEB, 'index.html'), html);
+  fs.writeFileSync(path.join(OUT, 'index.html'), html);
+  process.stderr.write(`wrote ${path.join(OUT, 'index.html')} and draws.json\n`);
   if (process.argv.includes('--print')) console.log(JSON.stringify(result, null, 1));
 })();

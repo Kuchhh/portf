@@ -251,16 +251,49 @@
         this.e[k] = e; this.q[k] = q;
       }
       this.tiers = Object.keys(coefs).map(Number);
+      // How often the crowd plays a whole six. A drawn number shifts log(winners) of tier k by about
+      // (k/6 - (6-k)/39) times its pick-rate effect, and a pair pattern by k(k-1)/30 of its effect;
+      // inverting that for tiers 2 and 3 gives the crowd's own number and pattern preferences.
+      this.p6 = new Float64Array(46);
+      this.q6 = new Float64Array(46 * 46).fill(1);
+      if (coefs[2] && coefs[3]) {
+        for (let i = 1; i <= 45; i++) this.p6[i] = Math.exp((coefs[2].beta[i - 1] / 0.23077 + coefs[3].beta[i - 1] / 0.42308) / 2);
+        const phi = [0, 1, 2, 3].map((j) => (15 * coefs[2].theta[j] + 5 * coefs[3].theta[j]) / 2);
+        for (let a = 1; a <= 45; a++) for (let c = a + 1; c <= 45; c++) {
+          const f = pairFeatures(a, c);
+          const v = Math.exp(phi[0] * f[0] + phi[1] * f[1] + phi[2] * f[2] + phi[3] * f[3]);
+          this.q6[a * 46 + c] = v; this.q6[c * 46 + a] = v;
+        }
+      } else {
+        this.p6.fill(1);
+      }
       this.norm = {};
       for (const k of this.tiers) this.norm[k] = 1;
+      this.norm6 = 1;
       const rng = mulberry32(seed), acc = {};
       for (const k of this.tiers) acc[k] = 0;
+      let acc6 = 0;
       for (let i = 0; i < nNorm; i++) {
-        const g = this.raw(sample6(rng));
+        const C = sample6(rng);
+        const g = this.raw(C);
         for (const k of this.tiers) acc[k] += g[k];
+        acc6 += this.pop6(C);
       }
       for (const k of this.tiers) this.norm[k] = acc[k] / nNorm;
+      this.norm6 = acc6 / nNorm;
     }
+    pop6(C) {
+      let v = 1;
+      for (let i = 0; i < 6; i++) {
+        v *= this.p6[C[i]];
+        for (let j = i + 1; j < 6; j++) v *= this.q6[C[i] * 46 + C[j]];
+      }
+      return v;
+    }
+    // how many times more (or less) often than an average ticket the crowd plays exactly these six numbers
+    popRel(C) { return this.pop6(C) / this.norm6; }
+    // chance that at least one other bet in a draw of `columns` bets has the same six numbers
+    shareChance(C, columns) { return 1 - Math.exp(-columns * H[6] * this.popRel(C)); }
     raw(C) {
       const out = {};
       for (const k of this.tiers) {
@@ -334,6 +367,25 @@
       if (!shared || reg.length < 8 || a < 0 || b < 0) { a = 0; b = perCol; }
       info.tiers[k] = { shared, fixed, perCol, a, b };
     }
+    const ns = reg.map((d) => d.N).sort((x, y) => x - y);
+    info.nMedian = ns.length ? ns[Math.floor(ns.length / 2)] : 0;
+    info.endNumber = lastDraw.n;
+    // boost: shared tiers carry a fixed sum on top of the bets (an accumulated fund being paid out);
+    // shared: prizes split between winners only; fixed: fixed prizes and an accumulating superprize
+    let fixedPart = 0, total = 0, evRest = 0;
+    for (const k of Object.keys(info.tiers).map(Number)) {
+      const t = info.tiers[k];
+      if (t.shared) {
+        fixedPart += t.a; total += t.a + t.b * info.nMedian;
+        evRest += info.nMedian ? (t.a + t.b * info.nMedian) / info.nMedian : t.perCol;
+      } else {
+        evRest += H[k] * t.fixed;
+      }
+    }
+    const sharedTiers = Object.keys(info.tiers).filter((k) => info.tiers[k].shared);
+    info.mode = !sharedTiers.length ? 'fixed' : total > 0 && fixedPart / total > 0.15 ? 'boost' : 'shared';
+    info.evRest = evRest;
+    info.breakEven = Math.max(0, (info.price - evRest) / H[6]); // superprize at which an average bet pays back
     const bySlot = {};
     for (const d of reg) (bySlot[d.date.slice(11, 16)] = bySlot[d.date.slice(11, 16)] || []).push(d);
     for (const s of Object.keys(bySlot).sort()) {
@@ -359,6 +411,16 @@
       }
     }
     return [avg, our];
+  }
+
+  // the rules that were in force before the current ones (what the game returns to when a payout campaign ends)
+  function previousRegime(draws) {
+    const cur = prizeRegime(draws);
+    const idx = draws.findIndex((d) => d.n === cur.startNumber);
+    if (idx <= 0) return null;
+    const prev = prizeRegime(draws.slice(0, idx));
+    prev.endNumber = draws[idx - 1].n;
+    return prev;
   }
 
   // ---------------------------------------------------------------- 4. choosing tickets
@@ -439,6 +501,22 @@
     return Object.keys(w).length ? w : { 2: 0.2, 3: 0.3, 4: 0.5 };
   }
 
+  // shared prizes: maximize the expected prize per hit; fixed prizes: only the superprize can be split,
+  // so pick the six numbers the fewest other people play
+  function strategyObjective(crowd, info) {
+    if (info.mode === 'fixed') return (C) => -Math.log(crowd.popRel(C));
+    return objective(crowd, tierWeights(info));
+  }
+
+  // how large the superprize has been lately: the yardstick for the break-even level under fixed prizes
+  function superprizeStats(draws) {
+    const last = draws[draws.length - 1];
+    const t = Date.parse(last.date.slice(0, 10));
+    const within = (days) => draws.filter((d) => d.sp > 0 && t - Date.parse(d.date.slice(0, 10)) <= days * 864e5).map((d) => d.sp);
+    const y3 = within(3 * 365), y1 = within(365).sort((a, b) => a - b);
+    return { last: last.sp, max3y: y3.reduce((m, v) => (v > m ? v : m), 0), median1y: y1.length ? y1[Math.floor(y1.length / 2)] : 0 };
+  }
+
   // ---------------------------------------------------------------- everything for the next draw
   function analyze(draws, opts = {}) {
     const randomness = randomnessReport(draws);
@@ -447,9 +525,12 @@
     const info = prizeRegime(draws);
     const recent = draws.slice(-50).map((d) => d.balls.slice());
     const last = draws[draws.length - 1];
-    const model = { coefs: crowd.coefs, p: bias.p, recent, info };
+    const model = { coefs: crowd.coefs, p: bias.p, recent, info, prev: previousRegime(draws) };
     return {
-      status: { count: draws.length, first: { n: draws[0].n, date: draws[0].date }, last: { n: last.n, date: last.date, balls: last.sorted } },
+      status: {
+        count: draws.length, first: { n: draws[0].n, date: draws[0].date }, last: { n: last.n, date: last.date, balls: last.sorted },
+        superprize: superprizeStats(draws),
+      },
       randomness, bias: { passed: bias.passed, best: bias.best }, model,
       tickets: chooseTickets(model, opts.tickets || 10, opts.seed || last.n),
     };
@@ -461,18 +542,25 @@
     crowd = crowd || crowdFromModel(model);
     const recent = model.recent.map((b) => new Set(b));
     const rng = mulberry32(seed);
-    const list = pickTickets(objective(crowd, tierWeights(model.info)), n, recent, rng, n > 10 ? 2 : 6, n > 20 ? 3 : 2);
-    return list.map((C) => ({ C, mult: crowd.mult(C) }));
+    const list = pickTickets(strategyObjective(crowd, model.info), n, recent, rng, n > 10 ? 2 : 6, n > 20 ? 3 : 2);
+    return list.map((C) => ({ C, mult: crowd.mult(C), popRel: crowd.popRel(C) }));
   }
 
   // ---------------------------------------------------------------- walk-forward test on past draws
   async function backtest(draws, opts = {}, onProgress) {
     const start = opts.start || 5000, block = opts.block || 1000, k = opts.k || 10;
     const rng = mulberry32(opts.seed || 1);
-    const info = prizeRegime(draws);
+    // payouts are recomputed with the latest rules under which prizes were split between winners
+    let info = prizeRegime(draws), cut = draws.length;
+    for (let guard = 0; guard < 12 && info.mode === 'fixed'; guard++) {
+      cut = draws.findIndex((d) => d.n === info.startNumber);
+      if (cut <= 0) break;
+      info = prizeRegime(draws.slice(0, cut));
+    }
     const weights = tierWeights(info);
     const A = {};
-    for (const m of [2, 3, 4]) if (info.tiers[m]) A[m] = info.tiers[m].perCol / H[m]; // today's prize per expected winner
+    for (const m of [2, 3, 4]) if (info.tiers[m] && info.tiers[m].shared) A[m] = info.tiers[m].perCol / H[m]; // prize per expected winner
+    if (!Object.keys(A).length) { A[2] = 180; A[3] = 750; A[4] = 4400; }
     const names = ['anti', 'random', 'popular', 'hot', 'cold'];
     const blocks = [];
     let fits = null;
@@ -559,8 +647,8 @@
   }
 
   const api = { H, comb, chi2sf, solve, mulberry32, sample6, parseDraws, randomnessReport, biasModel, pairFeatures,
-    CrowdFit, Crowd, fitCrowd, prizeRegime, ticketValue, acceptable, pickTickets, objective, tierWeights,
-    analyze, crowdFromModel, chooseTickets, backtest };
+    CrowdFit, Crowd, fitCrowd, prizeRegime, previousRegime, ticketValue, acceptable, pickTickets, objective, tierWeights,
+    strategyObjective, analyze, crowdFromModel, chooseTickets, backtest };
   root.Lotto = api;
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
 })(typeof self !== 'undefined' ? self : globalThis);

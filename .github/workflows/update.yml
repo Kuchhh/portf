@@ -1,0 +1,54 @@
+# Downloads new «6 из 45» draws from stoloto.ru, rebuilds the page and publishes it to the main branch,
+# which GitHub Pages serves at https://kuchhh.github.io/portf/
+name: Обновление тиражей
+
+on:
+  schedule:
+    - cron: "12,42 * * * *" # every 30 minutes
+  workflow_dispatch:
+    inputs:
+      rebuild:
+        description: "Пересобрать страницу, даже если новых тиражей нет"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: draws-update
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+
+      - name: Скачать новые тиражи
+        run: python3 lotto-6x45/gosloto645.py update
+
+      - name: Пересобрать страницу
+        id: build
+        run: |
+          if [ "${{ inputs.rebuild }}" != "true" ] && git diff --quiet -- lotto-6x45/draws_6x45.csv; then
+            echo "Новых тиражей нет."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            node lotto-6x45/web/build.js --out .
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Опубликовать
+        if: steps.build.outputs.changed == 'true'
+        run: |
+          last=$(tail -n 1 lotto-6x45/draws_6x45.csv | cut -d, -f1)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lotto-6x45/draws_6x45.csv lotto-6x45/draws_6x45.meta.json index.html draws.json
+          if git diff --cached --quiet; then echo "Нечего публиковать."; exit 0; fi
+          git commit -m "Тиражи по №$last"
+          git push origin HEAD:main

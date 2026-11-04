@@ -6,6 +6,7 @@
 """
 import argparse
 import csv
+import datetime
 import json
 import math
 import os
@@ -143,7 +144,11 @@ def _save(known, complete):
             w.writerow({k: known[n].get(k, "") for k in FIELDS})
     os.replace(tmp, DATA_FILE)
     with open(META_FILE, "w", encoding="utf-8") as f:
-        json.dump({"complete": complete, "updated": time.strftime("%Y-%m-%d %H:%M")}, f)
+        json.dump({"complete": complete}, f)
+
+
+def _no_winners(r):
+    return all(r.get(f"w{k}") in ("", None) for k in TIERS)
 
 
 def update(verbose=True):
@@ -160,6 +165,7 @@ def update(verbose=True):
             complete = bool(json.load(open(META_FILE, encoding="utf-8")).get("complete"))
         except ValueError:
             complete = False
+    newest = max(known) if known else 0
     page, added = 1, 0
     while True:
         data = _get(page)
@@ -167,7 +173,13 @@ def update(verbose=True):
         fresh = 0
         for d in draws:
             rec = _parse(d)
-            if rec and rec["number"] not in known:
+            if not rec:
+                continue
+            old = known.get(rec["number"])
+            # a new draw, or a recent one stored before its winners were counted
+            late = (old is not None and rec["number"] > newest - 100
+                    and _no_winners(old) and not _no_winners(rec))
+            if old is None or late:
                 known[rec["number"]] = rec
                 fresh += 1
         added += fresh
@@ -417,14 +429,47 @@ class Crowd:
                 v = math.exp(-sum(theta[i] * f[i] for i in range(4)))
                 qk[a][c] = qk[c][a] = v
             self.q[k] = qk
+        # How often the crowd plays a whole six. A drawn number shifts log(winners) of tier k by about
+        # (k/6 - (6-k)/39) times its pick-rate effect, and a pair pattern by k(k-1)/30 of its effect;
+        # inverting that for tiers 2 and 3 gives the crowd's own number and pattern preferences.
+        self.p6 = [1.0] * 46
+        self.q6 = [[1.0] * 46 for _ in range(46)]
+        if 2 in coefs and 3 in coefs:
+            (b2, t2, _m2), (b3, t3, _m3) = coefs[2], coefs[3]
+            self.p6 = [1.0] + [math.exp((b2[i] / 0.23077 + b3[i] / 0.42308) / 2) for i in range(45)]
+            phi = [(15 * t2[j] + 5 * t3[j]) / 2 for j in range(4)]
+            for (a, c), f in PF.items():
+                v = math.exp(sum(phi[j] * f[j] for j in range(4)))
+                self.q6[a][c] = self.q6[c][a] = v
         rng = random.Random(seed)
         self.norm = {k: 1.0 for k in coefs}
+        self.norm6 = 1.0
         acc = {k: 0.0 for k in coefs}
+        acc6 = 0.0
         for _ in range(n_norm):
-            g = self.raw(sorted(rng.sample(range(1, 46), 6)))
+            C = sorted(rng.sample(range(1, 46), 6))
+            g = self.raw(C)
             for k in coefs:
                 acc[k] += g[k]
+            acc6 += self.pop6(C)
         self.norm = {k: acc[k] / n_norm for k in coefs}
+        self.norm6 = acc6 / n_norm
+
+    def pop6(self, C):
+        v = 1.0
+        for i, a in enumerate(C):
+            v *= self.p6[a]
+            for c in C[i + 1:]:
+                v *= self.q6[a][c]
+        return v
+
+    def pop_rel(self, C):
+        """How many times more (or less) often than an average ticket the crowd plays exactly these six numbers."""
+        return self.pop6(C) / self.norm6
+
+    def share_chance(self, C, columns):
+        """Chance that at least one other bet in a draw of `columns` bets has the same six numbers."""
+        return 1.0 - math.exp(-columns * H[6] * self.pop_rel(C))
 
     def raw(self, C):
         out = {}
@@ -492,6 +537,25 @@ def prize_regime(draws, window=14 * 24):
             a, b = 0.0, sum(y / x for x, y in zip(xs, ys)) / len(xs)
         per_col = sum(y / x for x, y in zip(xs, ys)) / len(xs)
         info["tiers"][k] = {"shared": shared, "fixed": fixed, "per_col": per_col, "a": a, "b": b}
+    ns = sorted(d["columns"] for d in reg)
+    nm = info["n_median"] = ns[len(ns) // 2] if ns else 0
+    info["end_number"] = draws[-1]["number"]
+    # boost: shared tiers carry a fixed sum on top of the bets (an accumulated fund being paid out);
+    # shared: prizes split between winners only; fixed: fixed prizes and an accumulating superprize
+    fixed_part = total = ev_rest = 0.0
+    for k, t in info["tiers"].items():
+        if t["shared"]:
+            fixed_part += t["a"]
+            total += t["a"] + t["b"] * nm
+            ev_rest += (t["a"] + t["b"] * nm) / nm if nm else t["per_col"]
+        else:
+            ev_rest += H[k] * t["fixed"]
+    if not any(t["shared"] for t in info["tiers"].values()):
+        info["mode"] = "fixed"
+    else:
+        info["mode"] = "boost" if total > 0 and fixed_part / total > 0.15 else "shared"
+    info["ev_rest"] = ev_rest
+    info["break_even"] = max(0.0, (info["price"] - ev_rest) / H[6])  # superprize at which an average bet pays back
     slots = {}
     for d in reg:
         slots.setdefault(d["date"][11:16], []).append(d)
@@ -512,6 +576,27 @@ def ticket_value(info, mult, columns):
             avg += H[k] * t["fixed"]
             our += H[k] * t["fixed"]
     return avg, our
+
+
+def previous_regime(draws):
+    """The rules in force before the current ones: what the game returns to when a payout campaign ends."""
+    cur = prize_regime(draws)
+    idx = next((i for i, d in enumerate(draws) if d["number"] == cur["start_number"]), 0)
+    if idx <= 0:
+        return None
+    prev = prize_regime(draws[:idx])
+    prev["end_number"] = draws[idx - 1]["number"]
+    return prev
+
+
+def superprize_stats(draws):
+    """How large the superprize has been lately: the yardstick for the break-even level under fixed prizes."""
+    def day(d):
+        return datetime.date(int(d["date"][:4]), int(d["date"][5:7]), int(d["date"][8:10]))
+    t = day(draws[-1])
+    y3 = [d["superprize"] for d in draws if d["superprize"] > 0 and (t - day(d)).days <= 3 * 365]
+    y1 = sorted(d["superprize"] for d in draws if d["superprize"] > 0 and (t - day(d)).days <= 365)
+    return {"last": draws[-1]["superprize"], "max3y": max(y3, default=0), "median1y": y1[len(y1) // 2] if y1 else 0}
 
 
 # ----------------------------------------------------------------------------- 4. choosing tickets
@@ -599,6 +684,14 @@ def tier_weights(info):
     return w
 
 
+def strategy_objective(crowd, info):
+    """Shared prizes: maximize the expected prize per hit. Fixed prizes: only the superprize can be split,
+    so pick the six numbers the fewest other people play."""
+    if info["mode"] == "fixed":
+        return lambda C: -math.log(crowd.pop_rel(C))
+    return objective(crowd, tier_weights(info))
+
+
 # ----------------------------------------------------------------------------- commands
 
 def fmt_p(p):
@@ -611,6 +704,13 @@ def num(x, d=2):
 
 def rub(x, d=1):
     return f"{x:,.{d}f}".replace(",", " ").replace(".", ",")
+
+
+MODES = {
+    "boost": "раздача — призы за 2–4 числа делятся между победителями, и к каждому тиражу добавляется постоянная сумма",
+    "shared": "делимые призы — призы за 2–4 числа делятся между победителями, добавки нет",
+    "fixed": "обычный — фиксированные призы, суперприз копится",
+}
 
 
 def cmd_analyze(draws):
@@ -640,24 +740,46 @@ def cmd_predict(draws, n_tickets=3, bets=1, seed=None):
     print("   реже всего ставят: " + ", ".join(map(str, pop[:12])))
     print("   чаще всего ставят: " + ", ".join(map(str, pop[::-1][:12])))
     info = prize_regime(draws)
+    prev = previous_regime(draws)
+    sp = superprize_stats(draws)
     print(f"\n3. Правила выплат сейчас (с тиража №{info['start_number']}, тиражей: {info['draws']}): "
           f"ставка {info['price']} ₽, суперприз {rub(info['superprize'], 0)} ₽")
     for k, t in sorted(info["tiers"].items()):
         if t["shared"]:
-            kind = f"делится между победителями, фонд ≈ {rub(t['a'], 0)} ₽ + {num(t['b'])} ₽ с каждой ставки"
+            kind = "делится между победителями"
+            if t["a"] > 0:
+                kind += f", фонд ≈ {rub(t['a'], 0)} ₽ + {num(t['b'])} ₽ с каждой ставки"
         else:
             kind = f"фиксированный, {rub(t['fixed'], 0)} ₽"
         print(f"   угадано {k}: {kind}")
+    print(f"   режим: {MODES[info['mode']]}")
     rng = random.Random(seed)
     recent = [set(d["balls"]) for d in draws[-50:]]
     many = n_tickets > 10
-    tickets = pick_tickets(objective(crowd, tier_weights(info)), n_tickets, recent, rng,
+    tickets = pick_tickets(strategy_objective(crowd, info), n_tickets, recent, rng,
                            restarts=2 if many else 6, max_shared=3 if n_tickets > 20 else 2)
+    fixed = info["mode"] == "fixed"
+    cols = (info["n_median"] or 20000) + bets
     print("\n4. Комбинации на следующий тираж:")
     for C in tickets:
-        m = crowd.mult(C)
-        print("   " + " ".join(f"{x:2d}" for x in C) +
-              "   приз при выигрыше: " + ", ".join(f"за {k} ×{num(m[k])}" for k in (2, 3, 4)))
+        line = "   " + " ".join(f"{x:2d}" for x in C)
+        if fixed:
+            line += (f"   делить суперприз: {num(crowd.share_chance(C, cols) * 100)}%,"
+                     f" эту шестёрку ставят в {num(1 / crowd.pop_rel(C), 1)} раза реже среднего")
+        else:
+            m = crowd.mult(C)
+            line += "   приз при выигрыше: " + ", ".join(f"за {k} ×{num(m[k])}" for k in (2, 3, 4))
+        print(line)
+    price = info["price"]
+    if fixed:
+        ev = (info["ev_rest"] + H[6] * info["superprize"]) / price
+        print(f"\n5. Сейчас призы фиксированные, время тиража на выгоду почти не влияет.")
+        print(f"   Ставка возвращает в среднем {num(ev)} ₽ на 1 ₽ при суперпризе {rub(info['superprize'], 0)} ₽.")
+        print(f"   Окупается она при суперпризе от {rub(info['break_even'], 0)} ₽"
+              f" (за три года суперприз доходил максимум до {rub(sp['max3y'], 0)} ₽).")
+        print("   " + ("→ суперприз выше порога: ставка в среднем окупается." if info["superprize"] >= info["break_even"]
+                     else "→ суперприз ниже порога: в среднем ставка не окупается, выгоднее подождать."))
+        return tickets
     m0 = crowd.mult(tickets[0])
     extra = f" (вместе с вашими {bets} ставками)" if bets > 1 else ""
     print(f"\n5. Сколько в среднем возвращает одна ставка (до налогов), по времени тиража{extra}:")
@@ -666,21 +788,40 @@ def cmd_predict(draws, n_tickets=3, bets=1, seed=None):
     for s, v in info["slots"].items():
         avg, our = ticket_value(info, m0, v["columns"] + bets)
         rows.append((s, v["columns"], avg, our))
-        mark = "  ←" if our >= info["price"] else ""
-        print(f"   {s}  {v['columns']:7d}   {rub(avg):>9} ₽   {rub(our):>7} ₽   {num(our / info['price'])}{mark}")
+        mark = "  ←" if our >= price else ""
+        print(f"   {s}  {v['columns']:7d}   {rub(avg):>9} ₽   {rub(our):>7} ₽   {num(our / price)}{mark}")
     best = max(rows, key=lambda r: r[3])
-    print(f"\n   Выгоднее всего тираж в {best[0]}: {num(best[3] / info['price'])} ₽ на 1 ₽ ставки "
-          f"(обычный билет там же — {num(best[2] / info['price'])}).")
+    print(f"\n   Выгоднее всего тираж в {best[0]}: {num(best[3] / price)} ₽ на 1 ₽ ставки "
+          f"(обычный билет там же — {num(best[2] / price)}).")
+    if prev and prev["mode"] == "fixed":
+        t = prev["tiers"]
+        paid = ", ".join(f"за {k}{' числа' if i == 0 else ''} — {rub(t[k]['fixed'], 0)} ₽"
+                         for i, k in enumerate(k for k in (3, 4, 5) if k in t))
+        print(f"\n6. Когда раздача закончится, призы, скорее всего, снова станут фиксированными, как до тиража №{info['start_number']}:")
+        print(f"   {paid}.")
+        print("   Тогда программа сама переключится: будет брать шестёрки, которые реже всех ставят другие,")
+        print("   чтобы не делить суперприз. Время тиража перестанет влиять на выгоду, а ставка будет")
+        print(f"   окупаться только при суперпризе от {rub(prev['break_even'], 0)} ₽; за три года он доходил до {rub(sp['max3y'], 0)} ₽.")
     return tickets
 
 
 def cmd_backtest(draws, start=5000, block=1000, k=10, seed=1):
     """Walk-forward test: for every block of draws the model sees only earlier draws."""
     rng = random.Random(seed)
-    info = prize_regime(draws)
+    # payouts are recomputed with the latest rules under which prizes were split between winners
+    info, cut = prize_regime(draws), len(draws)
+    for _ in range(12):
+        if info["mode"] != "fixed":
+            break
+        cut = next((i for i, d in enumerate(draws) if d["number"] == info["start_number"]), 0)
+        if cut <= 0:
+            break
+        info = prize_regime(draws[:cut])
     weights = tier_weights(info)
-    # a hit pays today's average prize per expected winner, divided by the draw's actual winners
-    A = {kk: info["tiers"][kk]["per_col"] / H[kk] for kk in (2, 3, 4) if kk in info["tiers"]}
+    # a hit pays that average prize per expected winner, divided by the draw's actual winners
+    A = {kk: info["tiers"][kk]["per_col"] / H[kk] for kk in (2, 3, 4) if kk in info["tiers"] and info["tiers"][kk]["shared"]}
+    if not A:
+        A = {2: 180.0, 3: 750.0, 4: 4400.0}
     names = ["антитолпа", "случайные", "популярные", "горячие", "холодные"]
     # per block and strategy: hits by tier, sum of relative prize and hits per tier, payouts
     blocks = []
@@ -799,6 +940,8 @@ def main():
         try:
             update()
         except Exception as e:
+            if cmd == "update":
+                sys.exit(f"Не удалось обновить архив: {e}")
             print(f"Не удалось обновить архив ({e}); считаю по сохранённому.")
         if cmd == "update":
             return
