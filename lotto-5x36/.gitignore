@@ -1,0 +1,5 @@
+__pycache__/
+*.tmp
+# local builds of the page; the published copy lives in /5x36
+web/index.html
+web/state.json

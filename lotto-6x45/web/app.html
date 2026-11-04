@@ -116,6 +116,9 @@
   .mults b { color: var(--ink); font-weight: 600; }
   .copy { padding: 6px 10px; min-height: 34px; font-size: 13px; }
   .legend-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+  .nav a, .nav span { border-radius: 999px; padding: 4px 12px; text-decoration: none; box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); }
+  .nav span { background: var(--accent); color: var(--accent-ink); box-shadow: none; font-weight: 600; }
   .ramp-group { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
   .ramp { width: 140px; height: 10px; border-radius: 5px; }
 
@@ -229,6 +232,7 @@
 <body>
 <main class="page">
   <header class="masthead">
+    <nav class="nav" aria-label="Лотереи"><span aria-current="page">6 из 45</span><a href="5x36/">5 из 36</a></nav>
     <h1>6 из 45 против толпы</h1>
     <p class="lede">Числа выпадают равновероятно, но выигрыш часто делится между всеми, кто угадал. Поэтому выгоднее ставить то, что другие игроки берут реже, и выбирать тиражи, в которых ставка возвращает больше.</p>
     <p class="status" id="status"></p>

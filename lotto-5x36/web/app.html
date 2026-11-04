@@ -1,0 +1,732 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>5 из 36: главные призы</title>
+<meta name="description" content="«5 из 36»: когда ставка на суперприз выгоднее всего, проверка генератора на всём архиве тиражей и комбинации, с которыми суперприз реже делят. Обновляется автоматически.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="5 из 36: главные призы">
+<meta property="og:title" content="5 из 36: главные призы">
+<meta property="og:description" content="Когда ставка на суперприз «5 из 36» выгоднее всего, проверка генератора на всём архиве и комбинации, с которыми суперприз реже делят.">
+<meta property="og:url" content="https://kuchhh.github.io/portf/5x36/">
+<meta property="og:locale" content="ru_RU">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%23d6532a'/%3E%3Ctext x='16' y='21.5' font-family='Arial Black,Arial' font-size='14' font-weight='900' text-anchor='middle' fill='white'%3E36%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Russo+One&display=swap">
+<style>
+  /* Layout: a betting slip on top (the combinations), then "when to play" with the next draw, the strategy for each
+     payout mode, then the evidence — the crowd's number grid, the randomness checks and the walk-forward test. */
+  :root {
+    --plane: #f3f3f1;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --hair: #e1e0d9;
+    --axis: #c3c2b7;
+    --accent: #2a78d6;
+    --accent-soft: #cde2fb;
+    --accent-ink: #ffffff;
+    --good-ink: #006300;
+    --div-neg: #2a78d6;   /* rarely played */
+    --div-mid: #f0efec;
+    --div-pos: #e34948;   /* often played */
+    --ring: rgba(11, 11, 11, 0.10);
+    --f-display: "Russo One", "Arial Black", system-ui, sans-serif;
+    --f-ui: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-soft: #184f95; --accent-ink: #ffffff; --good-ink: #0ca30c;
+      --div-neg: #3987e5; --div-mid: #383835; --div-pos: #e66767; --ring: rgba(255, 255, 255, 0.10);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-soft: #184f95; --accent-ink: #ffffff; --good-ink: #0ca30c;
+    --div-neg: #3987e5; --div-mid: #383835; --div-pos: #e66767; --ring: rgba(255, 255, 255, 0.10);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--plane); color: var(--ink); font-family: var(--f-ui); font-size: 15px; line-height: 1.5; }
+  .page {
+    max-width: 1080px; margin: 0 auto;
+    padding-block: max(28px, env(safe-area-inset-top, 0px)) max(48px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid; gap: 20px;
+  }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  .masthead { display: grid; gap: 8px; padding-block: 4px 8px; }
+  .masthead h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; letter-spacing: 0.01em; }
+  .masthead .lede { color: var(--ink-2); max-width: 62ch; font-size: 16px; }
+  .status { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .live { color: var(--ink-2); font-size: 13px; display: flex; align-items: center; gap: 8px; }
+  .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); flex: none; }
+  .live.ok::before { background: var(--good-ink); }
+
+  .card { background: var(--surface); border-radius: 14px; box-shadow: 0 0 0 1px var(--ring); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+  .card h2 { font-size: 19px; font-weight: 700; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .note { color: var(--ink-2); font-size: 13.5px; max-width: 70ch; }
+  .small { color: var(--muted); font-size: 12.5px; }
+
+  /* slip */
+  .slip-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 20px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 14px; }
+  .field { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+  select, input[type="number"] {
+    font: 500 15px var(--f-ui); color: var(--ink); background: var(--plane); border: 1px solid var(--axis);
+    border-radius: 8px; padding: 7px 10px; min-height: 38px; font-variant-numeric: tabular-nums;
+  }
+  input[type="number"] { width: 110px; }
+  button {
+    font: 600 14px var(--f-ui); color: var(--ink); background: transparent; border: 1px solid var(--axis);
+    border-radius: 8px; padding: 8px 14px; min-height: 38px; cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button.primary:hover { filter: brightness(1.07); }
+  button:disabled { opacity: 0.6; cursor: progress; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .tickets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .ticket {
+    display: grid; grid-template-columns: 28px auto 1fr auto; align-items: center; gap: 10px 16px;
+    padding: 12px 14px; border-radius: 12px; background: var(--plane);
+  }
+  .ticket .no { font-family: var(--f-display); color: var(--muted); font-size: 15px; }
+  .balls { display: flex; gap: 8px; }
+  .ball {
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--f-display); font-size: 19px; letter-spacing: 0.02em;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12), 0 0 0 2px var(--surface);
+  }
+  .mults { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .mults span { background: var(--surface); border-radius: 999px; padding: 3px 10px; box-shadow: 0 0 0 1px var(--ring); font-variant-numeric: tabular-nums; }
+  .mults b { color: var(--ink); font-weight: 600; }
+  .copy { padding: 6px 10px; min-height: 34px; font-size: 13px; }
+  .legend-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .ramp-group { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+  .ramp { width: 140px; height: 10px; border-radius: 5px; }
+
+  /* when to play */
+  .mode-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; background: var(--accent-soft); color: var(--ink); }
+  .next { display: grid; gap: 4px; padding: 12px 14px; border-radius: 12px; background: var(--plane); font-variant-numeric: tabular-nums; }
+  .next strong { font-size: 17px; }
+  .when-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
+  .hero-fig { display: grid; gap: 6px; align-content: start; }
+  .hero-fig .big { font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
+  .hero-fig .big small { font-size: 22px; font-weight: 600; color: var(--ink-2); margin-left: 4px; }
+  .hero-fig .what { color: var(--ink-2); max-width: 36ch; }
+  .bars { display: grid; gap: 2px; position: relative; }
+  .bar-row { display: grid; grid-template-columns: 48px 1fr 52px; align-items: center; gap: 10px; min-height: 26px; font-variant-numeric: tabular-nums; font-size: 13.5px; border-radius: 6px; }
+  .bar-row .t { color: var(--ink-2); }
+  .bar-row .v { text-align: right; color: var(--ink-2); }
+  .bar-row.win .v { color: var(--ink); font-weight: 700; }
+  .bar-row.next-slot .t { color: var(--ink); font-weight: 700; }
+  .track { position: relative; height: 26px; }
+  .track .bar { position: absolute; left: 0; top: 6px; height: 14px; background: var(--accent); border-radius: 0 4px 4px 0; }
+  .track .ref { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--ink-2); }
+  .bar-row:hover .track .bar, .bar-row:focus-visible .track .bar { filter: brightness(1.12); }
+  .bars-axis { display: grid; grid-template-columns: 48px 1fr 52px; gap: 10px; font-size: 12px; color: var(--muted); }
+  .bars-axis .scale { position: relative; height: 18px; }
+  .bars-axis .scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .meter { position: relative; height: 14px; border-radius: 7px; background: var(--accent-soft); overflow: hidden; }
+  .meter > div { position: absolute; inset: 0 auto 0 0; background: var(--accent); border-radius: 7px; }
+  .rules { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+  /* strategy by mode */
+  .modes { display: grid; gap: 10px; }
+  .mode { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.6fr); gap: 8px 20px; padding: 14px; border-radius: 12px; background: var(--plane); }
+  .mode.current { box-shadow: inset 0 0 0 2px var(--accent); }
+  .mode h3 { font-size: 15px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .mode .sign { color: var(--ink-2); font-size: 13.5px; }
+  .mode ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; color: var(--ink-2); font-size: 14px; }
+  .mode ul b { color: var(--ink); }
+  .badge { font-size: 11.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 2px 8px; }
+
+  /* evidence columns */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .grid45 { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; max-width: 520px; }
+  .cell {
+    aspect-ratio: 1; max-width: 100%; border-radius: 8px; display: grid; place-items: center;
+    font-family: var(--f-display); font-size: clamp(12px, 2.6vw, 16px); cursor: default;
+  }
+  .cell:hover, .cell:focus-visible { box-shadow: 0 0 0 2px var(--ink); }
+  details { font-size: 13.5px; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin-top: 8px; }
+  table { border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; width: 100%; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  tr.ours td { font-weight: 700; }
+  .checks { display: grid; gap: 0; }
+  .check { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--hair); font-size: 14px; }
+  .check:last-child { border-bottom: 0; }
+  .check .val { font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; }
+  .verdict { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; color: var(--good-ink); }
+  .verdict svg { flex: none; }
+
+  /* history */
+  .dots { display: grid; gap: 4px; }
+  .dot-row { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 66px; align-items: center; gap: 12px; min-height: 30px; font-size: 13.5px; border-radius: 6px; }
+  .dot-row .lab { color: var(--ink-2); }
+  .dot-row.ours .lab, .dot-row.ours .v { color: var(--ink); font-weight: 700; }
+  .dot-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .plot { position: relative; height: 30px; }
+  .plot .ci { position: absolute; top: 14px; height: 2px; background: var(--accent); border-radius: 1px; }
+  .plot .pt { position: absolute; top: 9px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+  .plot .ref { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink-2); }
+  .dot-row:hover .pt, .dot-row:focus-visible .pt { transform: scale(1.25); }
+  .dots-axis { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 66px; gap: 12px; font-size: 12px; color: var(--muted); }
+  .dots-axis .scale { position: relative; height: 18px; }
+  .dots-axis .scale span { position: absolute; transform: translateX(-50%); }
+  .progress { height: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width 0.2s; }
+  .about { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .about h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .about p, .about li { color: var(--ink-2); font-size: 14px; }
+  .about ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  footer { color: var(--muted); font-size: 12.5px; display: grid; gap: 4px; }
+  footer a, .about a { color: var(--accent); }
+
+  .tip {
+    position: fixed; z-index: 30; pointer-events: none; background: var(--surface); color: var(--ink);
+    border-radius: 10px; box-shadow: 0 0 0 1px var(--ring), 0 8px 24px rgba(0, 0, 0, 0.18);
+    padding: 8px 10px; font-size: 13px; line-height: 1.45; max-width: 260px; font-variant-numeric: tabular-nums;
+  }
+  .tip .tv { font-weight: 700; font-size: 15px; }
+  .tip .tl { color: var(--ink-2); }
+
+  @media (max-width: 820px) {
+    .when-top, .cols, .mode { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .card { padding: 16px; }
+    .ticket { grid-template-columns: 1fr auto; }
+    .ticket .no { display: none; }
+    .ticket .balls { grid-column: 1 / -1; }
+    .ball { width: 40px; height: 40px; font-size: 17px; }
+    .balls { gap: 6px; }
+    .hero-fig .big { font-size: 48px; }
+    .dot-row, .dots-axis { grid-template-columns: 112px 1fr 56px; gap: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+</style>
+<style>
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
+  .nav a, .nav span { border-radius: 999px; padding: 4px 12px; text-decoration: none; box-shadow: 0 0 0 1px var(--ring); color: var(--ink-2); }
+  .nav span { background: var(--accent); color: var(--accent-ink); box-shadow: none; font-weight: 600; }
+  .ball.bonus { background: var(--ink); color: var(--surface); }
+  .plus { font-family: var(--f-display); color: var(--muted); font-size: 18px; align-self: center; }
+  .grid36 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 4px; max-width: 360px; }
+  .verdict-box { display: grid; gap: 6px; padding: 12px 14px; border-radius: 12px; background: var(--plane); }
+  .verdict-box strong { font-size: 16px; }
+  .verdict-box.good { box-shadow: inset 0 0 0 2px var(--good-ink); }
+  .kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+  .kv div { padding: 10px 12px; border-radius: 10px; background: var(--plane); display: grid; gap: 2px; }
+  .kv b { font-size: 18px; font-variant-numeric: tabular-nums; }
+  .kv span { color: var(--ink-2); font-size: 12.5px; }
+  .meter .mark { position: absolute; top: -3px; bottom: -3px; width: 2px; background: var(--ink); }
+  .meter-axis { position: relative; height: 18px; font-size: 12px; color: var(--muted); }
+  .meter-axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .chart { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  .chart .ln { fill: none; stroke: var(--accent); stroke-width: 1.4; }
+  .chart .area { fill: var(--accent-soft); opacity: 0.6; }
+  .chart .gl { stroke: var(--hair); stroke-width: 1; }
+  .chart .rf { stroke: var(--ink-2); stroke-width: 1; stroke-dasharray: 4 3; }
+  .chart .q9 { stroke: var(--good-ink); stroke-width: 1; stroke-dasharray: 2 3; }
+  .chart text { fill: var(--muted); font: 12px var(--f-ui); }
+  .chart .lab { fill: var(--ink-2); }
+  .chart .cur { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+  .chart .hair { stroke: var(--ink-2); stroke-width: 1; }
+  .calc { display: grid; gap: 10px; }
+  .calc-row { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: end; }
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="masthead">
+    <nav class="nav" aria-label="Лотереи"><a href="../">6 из 45</a><span aria-current="page">5 из 36</span></nav>
+    <h1>5 из 36: главные призы</h1>
+    <p class="lede">Шанс угадать пять чисел одинаков у любой комбинации: генератор проверен на всём архиве и честен. На главные призы влияет одно — когда играть. Чем больше суперприз, тем больше в среднем возвращает ставка.</p>
+    <p class="status" id="status"></p>
+    <p class="live" id="live">Проверяю новые тиражи…</p>
+  </header>
+
+  <section class="card" id="now" aria-labelledby="nowTitle">
+    <div>
+      <p class="eyebrow">Следующий тираж</p>
+      <h2 id="nowTitle">Стоит ли играть сейчас</h2>
+    </div>
+    <div class="next" id="next"></div>
+    <div class="when-top">
+      <div class="hero-fig" id="hero"></div>
+      <div class="kv" id="kv"></div>
+    </div>
+    <div class="verdict-box" id="verdict"></div>
+    <div>
+      <div class="meter" id="meter" role="img"><div></div><span class="mark"></span></div>
+      <div class="meter-axis" id="meterAxis"></div>
+    </div>
+  </section>
+
+  <section class="card" id="slip" aria-labelledby="slipTitle">
+    <div class="slip-head">
+      <div>
+        <p class="eyebrow">Комбинации</p>
+        <h2 id="slipTitle">Пятёрки, которые реже ставят другие</h2>
+      </div>
+      <form class="controls" id="controls">
+        <label class="field">Комбинаций <select id="nTickets"></select></label>
+        <button type="button" class="primary" id="reroll">Подобрать другие</button>
+      </form>
+    </div>
+    <ol class="tickets" id="tickets"></ol>
+    <p class="small" id="slipNote"></p>
+  </section>
+
+  <section class="card" id="odds" aria-labelledby="oddsTitle">
+    <div>
+      <p class="eyebrow">Шансы</p>
+      <h2 id="oddsTitle">Сколько ставок нужно для главного приза</h2>
+    </div>
+    <div class="calc">
+      <div class="calc-row">
+        <label class="field">Ставок в тираже <input type="number" id="bets" min="1" max="1000000" step="1" value="10" inputmode="numeric"></label>
+      </div>
+      <div class="kv" id="calc"></div>
+      <p class="small">Ставки с разными пятёрками. Шансы складываются: 100 ставок в одном тираже или по одной в 100 тиражах дают одно и то же.</p>
+    </div>
+  </section>
+
+  <section class="card" id="history" aria-labelledby="historyTitle">
+    <div>
+      <p class="eyebrow">История</p>
+      <h2 id="historyTitle">Сколько давали суперпризы с 2017 года</h2>
+    </div>
+    <p class="note" id="historyNote"></p>
+    <svg class="chart" id="chart" viewBox="0 0 960 300" role="img" aria-labelledby="chartDesc"><desc id="chartDesc">Сколько рублей с рубля ставки давали суперпризы, лучший тираж каждого дня</desc></svg>
+    <div class="kv" id="histKv"></div>
+    <p class="small" id="timingNote"></p>
+  </section>
+
+  <div class="cols">
+    <section class="card" id="random" aria-labelledby="randomTitle">
+      <div>
+        <p class="eyebrow">Генератор</p>
+        <h2 id="randomTitle">Можно ли угадать числа</h2>
+      </div>
+      <p class="verdict" id="rverdict"></p>
+      <div class="checks" id="checks"></div>
+      <p class="small">p — вероятность получить такой же или больший разброс при честном генераторе. Значения около 0,5 означают, что отклонений нет. Прогноз «тираж за тиражом» строится только по прошлым тиражам; ниже нуля — хуже равных шансов.</p>
+    </section>
+    <section class="card" id="crowd" aria-labelledby="crowdTitle">
+      <div>
+        <p class="eyebrow">Что ставят другие</p>
+        <h2 id="crowdTitle">Популярность чисел</h2>
+      </div>
+      <p class="note">Призы за 2–4 числа фиксированные, поэтому число победителей прямо показывает, сколько людей поставили выпавшие числа.</p>
+      <div class="grid36" id="grid36" role="list"></div>
+      <div class="legend-line"><span class="ramp-group"><span>реже ставят</span><span class="ramp" id="ramp"></span><span>чаще</span></span></div>
+    </section>
+  </div>
+
+  <section class="card" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">Как это устроено</h2>
+    <div class="about">
+      <div>
+        <h3>Шанс</h3>
+        <p>Расчёт проверяет весь архив: частоты чисел, порядок выпадения, пары, доп. число, связь с прошлым тиражом, часы и годы, а также прогноз по частотам тираж за тиражом. Если генератор начнёт ошибаться в чью-то пользу, расчёт сам это учтёт. Пока такого нет.</p>
+      </div>
+      <div>
+        <h3>Выгода</h3>
+        <p>Призы за 2, 3 и 4 числа обычно фиксированные: 1, 10 и 100 ставок, они возвращают 28 копеек с рубля. Во время акций их меняют, и страница это учитывает. Остальное дают суперпризы: 5+1 с шансом 1 к 1 507 968 и 5 с шансом 1 к 502 656. Оба копятся, пока их не выиграют, поэтому выгода зависит от того, когда играть.</p>
+      </div>
+      <div>
+        <h3>Важно знать</h3>
+        <ul>
+          <li>Возврат — среднее по огромному числу ставок. Главный приз выпадает одной ставке из сотен тысяч.</li>
+          <li>Налоги на выигрыш в расчёт не входят.</li>
+          <li>Сервер обновляет данные каждые 30 минут, страница при открытии сама берёт свежие суперпризы.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p id="dataNote"></p>
+    <p>Исходный код, архив тиражей и версия для компьютера: <a href="https://github.com/Kuchhh/portf">github.com/Kuchhh/portf</a>.</p>
+  </footer>
+</main>
+<div class="tip" id="tip" hidden></div>
+<script>
+(() => {
+  'use strict';
+  const INIT = /*@INIT@*/;
+  const C = INIT.consts;
+  let S = INIT.state;
+  const $ = (id) => document.getElementById(id);
+  const nf0 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+  const dec = (x, d = 2) => x.toFixed(d).replace('.', ',').replace('-', '−');
+  const int = (x) => nf0.format(Math.round(x));
+  const mln = (x) => (x >= 1e6 ? dec(x / 1e6, x >= 1e7 ? 1 : 2) + ' млн' : int(x));
+  const dateRu = (s) => s.slice(8, 10) + '.' + s.slice(5, 7) + '.' + s.slice(0, 4) + ', ' + s.slice(11, 16);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const state = { n: 4, seed: 0, bets: 10 };
+  try { const s = JSON.parse(localStorage.getItem('five36') || '{}'); if (s.n) state.n = s.n; if (s.bets) state.bets = s.bets; } catch (e) {}
+  const remember = () => { try { localStorage.setItem('five36', JSON.stringify({ n: state.n, bets: state.bets })); } catch (e) {} };
+
+  // ---------------- tooltip
+  const tip = $('tip');
+  function showTip(rows, ev, anchor) {
+    tip.replaceChildren(...rows.map(([c, t]) => el('div', c, t)));
+    tip.hidden = false;
+    const r = anchor ? anchor.getBoundingClientRect() : null;
+    const x = ev && ev.clientX !== undefined ? ev.clientX : r.left + r.width / 2;
+    const y = ev && ev.clientY !== undefined ? ev.clientY : r.top;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, x + 14)) + 'px';
+    tip.style.top = Math.max(8, y - h - 12) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+
+  // ---------------- money
+  const share = (l) => (l > 1e-12 ? (1 - Math.exp(-l)) / l : 1);
+  function current() {
+    const nx = S.next && S.next.n > S.last.n ? S.next : null;
+    return {
+      n: nx ? nx.n : S.last.n + 1, date: nx ? nx.date : null,
+      sp1: nx ? nx.sp1 : S.last.sp1, sp2: nx ? nx.sp2 : S.last.sp2,
+      price: (nx && nx.ticket_price) || S.rules.price,
+    };
+  }
+  // small prizes: fixed ones pay H_k * prize; a shared one pays (a + b * bets) / bets
+  function smallValue(cols) {
+    let v = 0;
+    for (const k of [4, 3, 2]) {
+      const t = S.rules.tiers[k];
+      v += t.shared ? (t.a + t.b * cols) / Math.max(cols, 1) : C.H[k] * t.prize;
+    }
+    return v;
+  }
+  function ret(sp1, sp2, price, cols) {
+    cols = cols || S.rules.columns || 300;
+    const main = C.P51 * sp1 * share(cols * C.P51) + C.P5 * sp2 * share(cols * C.P5);
+    const small = smallValue(cols);
+    return { all: (small + main) / price, main: main / price, small: small / price };
+  }
+
+  // ---------------- Moscow time (UTC+3 all year)
+  const mskToMs = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10), +s.slice(11, 13) - 3, +s.slice(14, 16));
+  function nextDrawTime() {
+    const cur = current();
+    if (cur.date) return { ms: mskToMs(cur.date), exact: true };
+    const t = S.times.map(mskToMs);
+    const gaps = t.slice(1).map((v, i) => v - t[i]).sort((a, b) => a - b);
+    const gap = gaps.length ? gaps[Math.floor(gaps.length / 2)] : 30 * 60000;
+    let ms = t[t.length - 1] + gap;
+    while (ms < Date.now()) ms += gap;
+    return { ms, exact: false };
+  }
+  const inTime = (m) => (m < 1 ? 'меньше минуты' : m < 60 ? m + ' мин' : Math.floor(m / 60) + ' ч ' + (m % 60) + ' мин');
+  const hhmm = (ms) => new Intl.DateTimeFormat('ru-RU', { timeZone: 'Europe/Moscow', hour: '2-digit', minute: '2-digit' }).format(new Date(ms));
+
+  // ---------------- header
+  function renderStatus() {
+    $('status').textContent = 'Архив: ' + int(S.count) + ' тиражей, с №' + INIT.first.n + ' (' + dateRu(INIT.first.date).slice(0, 10) + ') по №' + S.last.n + ' (' + dateRu(S.last.date) + ' МСК). Последний: ' + S.last.balls.join(' ') + ' + ' + S.last.bonus + '.';
+    $('dataNote').textContent = 'Данные: архив тиражей «5 из 36» с stoloto.ru. Сервер докачивает новые тиражи каждые 30 минут; полный разбор архива пересчитывается раз в день.';
+  }
+
+  // ---------------- now
+  function renderNow() {
+    const cur = current(), H = INIT.hist;
+    const r = ret(cur.sp1, cur.sp2, cur.price);
+    const nt = nextDrawTime();
+    const wait = Math.max(0, Math.round((nt.ms - Date.now()) / 60000));
+    $('next').replaceChildren(
+      el('strong', null, 'Тираж №' + cur.n + ' — в ' + hhmm(nt.ms) + ' МСК (через ' + inTime(wait) + ')'),
+      el('span', null, 'Суперприз 5+1 — ' + int(cur.sp1) + ' ₽, суперприз за 5 чисел — ' + int(cur.sp2) + ' ₽. Ставка ' + cur.price + ' ₽.'),
+      el('span', 'small', nt.exact ? 'Суперпризы этого тиража уже объявлены.' : 'Время рассчитано по расписанию последних тиражей, суперпризы — после последнего тиража.'));
+    const big = el('div', 'big', dec(r.main)); big.appendChild(el('small', null, '₽ с рубля'));
+    $('hero').replaceChildren(big, el('p', 'what', 'дают суперпризы в этом тираже. Вместе с призами за 2–4 числа ставка возвращает в среднем ' + dec(r.all) + ' ₽ на рубль.'));
+    const need2 = (cur.price - smallValue(S.rules.columns || 300) - C.P51 * cur.sp1) / C.P5;
+    const kv = $('kv');
+    kv.replaceChildren();
+    [[dec(H.m_median), 'обычно за последний год'], [dec(H.m_q90), 'у 10% лучших тиражей года'], [dec(H.m_max_year), 'максимум за год'], [dec(H.m_max_ever), 'максимум за всю историю']]
+      .forEach(([v, t]) => { const d = el('div'); d.append(el('b', null, v), el('span', null, t)); kv.appendChild(d); });
+    const vb = $('verdict');
+    const good = r.all >= 1 || r.main >= H.m_q90;
+    vb.className = 'verdict-box' + (good ? ' good' : '');
+    let head, body;
+    if (r.all >= 1) {
+      head = 'Ставка окупается'; body = 'Суперпризы и призы сейчас так велики, что ставка в среднем возвращает больше, чем стоит.';
+    } else if (r.main >= H.m_q90) {
+      head = 'Сейчас хороший момент'; body = 'Суперпризы входят в 10% самых крупных за год. За три года игра только в такие моменты давала втрое больше суперпризов на рубль.';
+    } else {
+      const grow = C.P51 * H.sp1_step_mean + C.P5 * H.sp2_step_mean;
+      const steps = grow > 0 ? Math.ceil(((H.m_q90 - r.main) * cur.price) / grow) : null;
+      head = 'Лучше подождать';
+      const pl = (n, a, b, c) => { const m = n % 100, k = n % 10; return m > 10 && m < 20 ? c : k === 1 ? a : k > 1 && k < 5 ? b : c; };
+      body = 'До 10% лучших моментов года суперпризам нужно вырасти' + (steps ? ': это примерно ' + int(steps) + ' ' + pl(steps, 'тираж', 'тиража', 'тиражей') + ' (' + (steps < 48 ? 'меньше суток' : '≈' + int(steps / 48) + ' дн.') + '), если их не выиграют раньше.' : '.');
+    }
+    vb.replaceChildren(el('strong', null, head), el('span', null, body),
+      el('span', 'small', 'Ставка окупилась бы при суперпризе за 5 чисел от ' + mln(need2) + ' ₽ (при нынешнем 5+1). За год он доходил до ' + mln(H.sp2_max) + ' ₽, за всю историю — до ' + mln(H.sp2_max_ever) + ' ₽.'));
+    if (S.rules.kind === 'shared') {
+      const slots = Object.entries(S.rules.slots).map(([t, c]) => [t, ret(cur.sp1, cur.sp2, cur.price, c + 1).all, c]).sort((a, b) => b[1] - a[1]).slice(0, 6);
+      vb.appendChild(el('span', null, 'Сейчас акция: приз за 3 числа делится между победителями, поэтому выгоднее тиражи, где мало ставок. Лучшие: ' + slots.map(([t, v]) => t + ' — ' + dec(v)).join(', ') + ' ₽ на рубль.'));
+    } else if (S.rules.kind === 'promo') {
+      vb.appendChild(el('span', null, 'Сейчас акция: призы за 2–4 числа изменены и возвращают ' + dec(r.small) + ' ₽ с рубля вместо обычных 0,28.'));
+    }
+    const hi = Math.max(H.m_max_year, r.main) * 1.05;
+    const pos = (v) => (v / hi) * 100;
+    const m = $('meter');
+    m.firstElementChild.style.width = Math.min(100, pos(r.main)) + '%';
+    m.querySelector('.mark').style.left = pos(H.m_q90) + '%';
+    m.setAttribute('aria-label', 'Суперпризы дают ' + dec(r.main) + ' ₽ с рубля; 10% лучших тиражей года — от ' + dec(H.m_q90) + '; максимум за год ' + dec(H.m_max_year));
+    const ax = $('meterAxis');
+    ax.replaceChildren();
+    const marks = [[0, '0'], [H.m_q90, 'лучшие 10% — от ' + dec(H.m_q90)], [H.m_max_year, 'максимум года ' + dec(H.m_max_year)]];
+    marks.forEach(([v, t]) => { const sp = el('span', null, t); sp.style.left = Math.max(4, Math.min(90, pos(v))) + '%'; ax.appendChild(sp); });
+  }
+
+  // ---------------- tickets
+  function mulberry32(a) { return () => { a |= 0; a = (a + 0x6d2b79f5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function sample5(rng) { const a = Array.from({ length: C.N }, (_, i) => i + 1); for (let i = 0; i < C.K; i++) { const j = i + Math.floor(rng() * (C.N - i)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, C.K).sort((x, y) => x - y); }
+  function acceptable(Cs, recent) {
+    let run = 1, best = 1;
+    for (let i = 1; i < Cs.length; i++) { run = Cs[i] - Cs[i - 1] === 1 ? run + 1 : 1; if (run > best) best = run; }
+    if (best >= 3) return false;
+    const tens = [0, 0, 0, 0]; for (const x of Cs) tens[Math.floor(x / 10)]++;
+    if (Math.max(...tens) >= 4) return false;
+    for (const w of [6, 7, 9]) { const c = new Array(w).fill(0); for (const x of Cs) c[(x - 1) % w]++; if (Math.max(...c) >= 4) return false; }
+    const ss = new Set(Cs);
+    for (let i = 0; i < Cs.length; i++) for (let j = i + 1; j < Cs.length; j++) { const a = Cs[i], st = Cs[j] - a; if (ss.has(a + 2 * st) && ss.has(a + 3 * st)) return false; }
+    for (const r of recent) { let k = 0; for (const x of Cs) if (r.has(x)) k++; if (k >= 4) return false; }
+    return true;
+  }
+  const common = (A, B) => A.filter((x) => B.includes(x)).length;
+  const popRel = (Cs) => Cs.reduce((v, x) => v * INIT.crowd.q[x], 1) / INIT.crowd.norm;
+  const score = (Cs) => Cs.reduce((s, x) => s + Math.log(INIT.bias.p_main[x] || 1), 0) - 0.01 * Math.log(popRel(Cs));
+  function pickTickets(n, seed) {
+    const rng = mulberry32(seed), recent = S.recent.map((b) => new Set(b)), chosen = [];
+    for (let t = 0; t < n; t++) {
+      let bestC = null, bestS = -Infinity;
+      for (let r = 0; r < 4; r++) {
+        let Cs = null;
+        for (let k = 0; k < 500; k++) { const c = sample5(rng); if (acceptable(c, recent) && chosen.every((o) => common(c, o) <= 2)) { Cs = c; break; } }
+        if (!Cs) continue;
+        let cur = score(Cs), improved = true;
+        while (improved) {
+          improved = false;
+          let candS = cur, candC = null;
+          for (let i = 0; i < C.K; i++) {
+            const rest = Cs.slice(0, i).concat(Cs.slice(i + 1));
+            for (let x = 1; x <= C.N; x++) {
+              if (Cs.includes(x)) continue;
+              const c2 = rest.concat([x]).sort((a, b) => a - b);
+              if (!acceptable(c2, recent) || chosen.some((o) => common(c2, o) > 2)) continue;
+              const s = score(c2);
+              if (s > candS + 1e-12) { candS = s; candC = c2; }
+            }
+          }
+          if (candC) { Cs = candC; cur = candS; improved = true; }
+        }
+        if (cur > bestS) { bestS = cur; bestC = Cs; }
+      }
+      if (bestC) chosen.push(bestC);
+    }
+    const pb = INIT.bias.p_bonus;
+    const top = INIT.bias.bonus > 10 ? [1, 2, 3, 4].reduce((a, b) => (pb[b] > pb[a] ? b : a)) : 0;
+    return chosen.map((c, i) => ({ C: c, bonus: top || (i % C.NB) + 1 }));
+  }
+  const tint = (x) => {
+    const d = INIT.crowd.q.map(Math.log), m = Math.max(...d.slice(1).map(Math.abs)) || 1;
+    const t = d[x] / m;
+    return { bg: 'color-mix(in oklab, ' + (t < 0 ? 'var(--div-neg)' : 'var(--div-pos)') + ' ' + Math.round(Math.abs(t) * 100) + '%, var(--div-mid))', fg: Math.abs(t) > 0.55 ? '#fff' : 'var(--ink)', t };
+  };
+  let tickets = [];
+  function renderTickets() {
+    tickets = pickTickets(Math.max(state.n, 1), state.seed || S.last.n);
+    const list = $('tickets');
+    list.replaceChildren();
+    tickets.forEach((t, i) => {
+      const li = el('li', 'ticket');
+      const balls = el('div', 'balls');
+      t.C.forEach((x) => { const b = el('span', 'ball', String(x)); const c = tint(x); b.style.background = c.bg; b.style.color = c.fg; balls.appendChild(b); });
+      balls.append(el('span', 'plus', '+'), el('span', 'ball bonus', String(t.bonus)));
+      const m = el('div', 'mults');
+      const s = el('span'); s.append('ставят '); s.appendChild(el('b', null, 'в ' + dec(1 / popRel(t.C), 1) + ' раза реже')); m.appendChild(s);
+      const cp = el('button', 'copy', 'Скопировать'); cp.type = 'button';
+      cp.addEventListener('click', () => {
+        const done = () => { cp.textContent = 'Скопировано'; setTimeout(() => { cp.textContent = 'Скопировать'; }, 1500); };
+        try { navigator.clipboard.writeText(t.C.join(' ') + ' + ' + t.bonus).then(done, () => {}); } catch (e) {}
+      });
+      li.append(el('span', 'no', String(i + 1)), balls, m, cp);
+      list.appendChild(li);
+    });
+    $('slipNote').textContent = 'Шанс угадать у этих пятёрок такой же, как у любых других. Но их ставят в 1,5–2 раза реже средней, поэтому выигранный суперприз реже придётся делить. Доп. числа 1–4 распределены поровну: генератор выбирает их равновероятно.';
+  }
+
+  // ---------------- odds calculator
+  function renderCalc() {
+    const n = state.bets, cur = current(), r = ret(cur.sp1, cur.sp2, cur.price, (S.rules.columns || 300) + n);
+    const rows = [
+      ['1 к ' + int(1 / Math.min(1, n * C.P51)), 'шанс суперприза 5+1'],
+      ['1 к ' + int(1 / Math.min(1, n * C.P5)), 'шанс суперприза за 5 чисел'],
+      ['1 к ' + int(1 / Math.min(1, n * C.H[5])), 'шанс хотя бы одного из двух'],
+      [int(n * cur.price) + ' ₽', 'стоимость; в среднем вернётся ' + int(n * cur.price * r.all) + ' ₽'],
+    ];
+    const box = $('calc');
+    box.replaceChildren();
+    rows.forEach(([v, t]) => { const d = el('div'); d.append(el('b', null, v), el('span', null, t)); box.appendChild(d); });
+  }
+
+  // ---------------- history chart
+  function renderHistory() {
+    const H = INIT.hist, T = INIT.timing, ser = INIT.series;
+    const peak = ser.reduce((a, b) => (b[1] > a[1] ? b : a));
+    $('historyNote').textContent = 'Сколько рублей с каждого рубля ставки давали суперпризы, лучший тираж каждого дня. Больше всего — ' + dec(peak[1]) + ' ₽ ' + peak[0].slice(8, 10) + '.' + peak[0].slice(5, 7) + '.' + peak[0].slice(0, 4) + ', когда суперприз 5+1 был ' + mln(peak[2]) + ' ₽, а за 5 чисел — ' + mln(peak[3]) + ' ₽. Зелёная линия — порог 10% лучших тиражей последнего года, пунктир — сколько суперпризы должны давать, чтобы ставка окупалась при обычных призах.';
+    const svg = $('chart');
+    const W = 960, Hh = 300, L = 44, R = 12, Tp = 12, B = 28;
+    const xs = ser.map((s) => Date.UTC(+s[0].slice(0, 4), +s[0].slice(5, 7) - 1, +s[0].slice(8, 10)));
+    const x0 = xs[0], x1 = xs[xs.length - 1];
+    const be = 1 - smallValue(S.rules.columns || 300) / S.rules.price;
+    const ymax = Math.max(be, ...ser.map((s) => s[1])) * 1.05, ymin = 0;
+    const X = (t) => L + ((t - x0) / (x1 - x0)) * (W - L - R), Y = (v) => Tp + (1 - (v - ymin) / (ymax - ymin)) * (Hh - Tp - B);
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (tag, attrs, text) => { const e = document.createElementNS(ns, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text !== undefined) e.textContent = text; return e; };
+    while (svg.childNodes.length > 1) svg.removeChild(svg.lastChild);
+    const stepY = ymax > 0.8 ? 0.2 : 0.1;
+    for (let v = 0; v <= ymax; v += stepY) {
+      v = Math.round(v * 10) / 10;
+      svg.append(mk('line', { x1: L, x2: W - R, y1: Y(v), y2: Y(v), class: 'gl' }), mk('text', { x: L - 6, y: Y(v) + 4, 'text-anchor': 'end' }, dec(v, 1)));
+    }
+    for (let y = +ser[0][0].slice(0, 4) + 1; y <= +ser[ser.length - 1][0].slice(0, 4); y++) {
+      const t = Date.UTC(y, 0, 1);
+      svg.append(mk('text', { x: X(t), y: Hh - 8, 'text-anchor': 'middle' }, String(y)));
+    }
+    let d = '';
+    xs.forEach((t, i) => { d += (i ? 'L' : 'M') + X(t).toFixed(1) + ' ' + Y(ser[i][1]).toFixed(1); });
+    svg.append(mk('path', { d: d + 'L' + X(x1) + ' ' + Y(ymin) + 'L' + X(x0) + ' ' + Y(ymin) + 'Z', class: 'area' }), mk('path', { d, class: 'ln' }));
+    svg.append(mk('line', { x1: L, x2: W - R, y1: Y(be), y2: Y(be), class: 'rf' }), mk('text', { x: W - R, y: Y(be) - 5, 'text-anchor': 'end', class: 'lab' }, 'окупается'));
+    svg.append(mk('line', { x1: L, x2: W - R, y1: Y(H.m_q90), y2: Y(H.m_q90), class: 'q9' }));
+    const hair = mk('line', { y1: Tp, y2: Hh - B, class: 'hair', visibility: 'hidden' });
+    const dot = mk('circle', { r: 4, class: 'cur', visibility: 'hidden' });
+    svg.append(hair, dot);
+    const move = (ev) => {
+      const box = svg.getBoundingClientRect();
+      const px = ((ev.clientX - box.left) / box.width) * W;
+      const t = x0 + ((px - L) / (W - L - R)) * (x1 - x0);
+      let i = xs.findIndex((v) => v >= t); if (i < 0) i = xs.length - 1;
+      const s = ser[i];
+      hair.setAttribute('x1', X(xs[i])); hair.setAttribute('x2', X(xs[i])); hair.setAttribute('visibility', 'visible');
+      dot.setAttribute('cx', X(xs[i])); dot.setAttribute('cy', Y(s[1])); dot.setAttribute('visibility', 'visible');
+      showTip([['tv', dec(s[1]) + ' ₽ с рубля'], ['tl', s[0].slice(8, 10) + '.' + s[0].slice(5, 7) + '.' + s[0].slice(0, 4)], ['tl', '5+1: ' + mln(s[2]) + ' ₽, 5: ' + mln(s[3]) + ' ₽'], ['tl', 'ставка ' + s[4] + ' ₽']], ev);
+    };
+    svg.onpointermove = move;
+    svg.onpointerleave = () => { hair.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); hideTip(); };
+    const kv = $('histKv');
+    kv.replaceChildren();
+    [[mln(H.sp1_min) + '–' + mln(H.sp1_max) + ' ₽', 'суперприз 5+1 за год; растёт в среднем на ' + int(H.sp1_step_mean) + ' ₽ за тираж'], [mln(H.sp2_min) + '–' + mln(H.sp2_max) + ' ₽', 'суперприз за 5 чисел за год; растёт на ' + int(H.sp2_step_mean) + ' ₽ за тираж'], [int(H.wins51_year) + ' и ' + int(H.wins5_year), 'раз за год выиграли 5+1 и 5'], [int(H.check_obs) + ' / ' + dec(H.check_exp, 0), 'выигрышей 5+1 и 5 с 2023 года / по теории']]
+      .forEach(([v, t]) => { const dd = el('div'); dd.append(el('b', null, v), el('span', null, t)); kv.appendChild(dd); });
+    $('timingNote').textContent = 'Проверка правила «играть только в 10% лучших моментов» на ' + int(T.draws) + ' тиражах за три года, порог каждый раз считался по предыдущему году: если играть в каждом тираже, суперпризы давали бы ' + dec(T.every, 3) + ' ₽ с рубля, по правилу (' + dec(T.share * 100, 0) + '% тиражей) — ' + dec(T.chosen, 3) + ' ₽, в ' + dec(T.chosen / T.every, 1) + ' раза больше.';
+  }
+
+  // ---------------- randomness
+  function renderRandom() {
+    const r = INIT.randomness, b = INIT.bias;
+    const v = $('rverdict');
+    v.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.2 9.3l2.4 2.4 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    v.appendChild(el('span', null, b.passed ? 'Найдено устойчивое смещение, оно учтено' : 'Отклонений нет: числа выпадают равновероятно'));
+    const p = (x) => (x < 1e-4 ? '< 0,0001' : dec(x, 3));
+    const rows = [
+      ['Частоты 36 чисел', 'p = ' + p(r.freq_p)],
+      ['Частоты по порядку выпадения', 'p от ' + p(Math.min(...r.pos_p)) + ' до ' + p(Math.max(...r.pos_p))],
+      ['Частоты 630 пар', 'p = ' + p(r.pairs_p)],
+      ['Совпадение с прошлым тиражом', dec(r.overlap_mean, 3) + ' при теории ' + dec(r.overlap_expected, 3)],
+      ['Доп. число 1–4', 'p = ' + p(r.bonus_p)],
+      ['Зависимость от часа тиража', 'p = ' + p(r.hour_p)],
+      ['Зависимость от года', 'p = ' + p(r.year_p)],
+      ['Прогноз чисел тираж за тиражом', dec(b.main, 1) + ' нат'],
+      ['Прогноз доп. числа тираж за тиражом', dec(b.bonus, 1) + ' нат'],
+    ];
+    const box = $('checks');
+    box.replaceChildren();
+    rows.forEach(([a, val]) => { const d = el('div', 'check'); d.append(el('span', null, a), el('span', 'val', val)); box.appendChild(d); });
+  }
+
+  // ---------------- crowd grid
+  function renderCrowd() {
+    const g = $('grid36');
+    g.replaceChildren();
+    for (let x = 1; x <= C.N; x++) {
+      const c = el('div', 'cell', String(x)); c.tabIndex = 0; c.setAttribute('role', 'listitem');
+      const t = tint(x); c.style.background = t.bg; c.style.color = t.fg;
+      const pct = (INIT.crowd.q[x] - 1) * 100;
+      const label = x + ': ставят на ' + dec(Math.abs(pct), 0) + '% ' + (pct < 0 ? 'реже' : 'чаще') + ' среднего';
+      c.setAttribute('aria-label', label);
+      c.addEventListener('pointermove', (ev) => showTip([['tv', (pct < 0 ? '−' : '+') + dec(Math.abs(pct), 0) + '%'], ['tl', 'как часто ставят ' + x + ' по сравнению со средним числом']], ev));
+      c.addEventListener('pointerleave', hideTip);
+      c.addEventListener('focus', () => showTip([['tv', (pct < 0 ? '−' : '+') + dec(Math.abs(pct), 0) + '%'], ['tl', label]], null, c));
+      c.addEventListener('blur', hideTip);
+      g.appendChild(c);
+    }
+    $('ramp').style.background = 'linear-gradient(90deg, var(--div-neg), var(--div-mid), var(--div-pos))';
+  }
+
+  // ---------------- controls
+  const sel = $('nTickets');
+  for (let i = 1; i <= 12; i++) { const o = el('option', null, String(i)); o.value = i; sel.appendChild(o); }
+  sel.value = String(state.n);
+  sel.addEventListener('change', () => { state.n = Number(sel.value); remember(); renderTickets(); });
+  $('controls').addEventListener('submit', (e) => e.preventDefault());
+  $('reroll').addEventListener('click', () => { state.seed = Math.floor(Math.random() * 1e9); renderTickets(); });
+  $('bets').value = String(state.bets);
+  $('bets').addEventListener('input', () => { state.bets = Math.max(1, Math.min(1e6, Math.round(Number($('bets').value) || 1))); remember(); renderCalc(); });
+
+  // ---------------- fresh state from the server
+  async function refresh() {
+    const live = $('live');
+    try {
+      const r = await fetch('state.json?v=' + Date.now(), { cache: 'no-store' });
+      if (!r.ok) throw new Error('данные не загрузились (' + r.status + ')');
+      const s = await r.json();
+      const t = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(new Date());
+      if (s.last.n > S.last.n || (s.next && (!S.next || s.next.n !== S.next.n))) {
+        const added = s.last.n - S.last.n;
+        S = s;
+        renderStatus(); renderNow(); renderTickets(); renderCalc();
+        live.textContent = 'Проверено в ' + t + (added > 0 ? ': добавлено тиражей — ' + added + ', суперпризы и комбинации обновлены.' : ': суперпризы обновлены.');
+      } else {
+        live.textContent = 'Проверено в ' + t + ': данные актуальны, последний тираж №' + s.last.n + '.';
+      }
+      live.className = 'live ok';
+    } catch (e) {
+      live.textContent = 'Не удалось проверить новые тиражи: ' + e.message + '. Показан расчёт на тираж №' + S.last.n + '.';
+      live.className = 'live';
+    }
+  }
+
+  renderStatus(); renderNow(); renderTickets(); renderCalc(); renderHistory(); renderRandom(); renderCrowd();
+  refresh();
+  setInterval(() => { if (!document.hidden) refresh(); }, 5 * 60 * 1000);
+  setInterval(() => { if (!document.hidden) renderNow(); }, 30 * 1000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderNow(); refresh(); } });
+  window.addEventListener('scroll', hideTip, { passive: true });
+})();
+</script>
+</body>
+</html>
