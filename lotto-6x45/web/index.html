@@ -1,0 +1,1224 @@
+<title>6 из 45 против толпы</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Russo+One&display=swap">
+<style>
+  /* Layout: a betting slip on top (the combinations), then "when to play", then the evidence — the crowd's
+     number grid, the randomness checks and the walk-forward test — in one column that splits in two on wide screens. */
+  :root {
+    --plane: #f3f3f1;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --muted: #898781;
+    --hair: #e1e0d9;
+    --axis: #c3c2b7;
+    --accent: #2a78d6;
+    --accent-ink: #ffffff;
+    --good-ink: #006300;
+    --div-neg: #2a78d6;   /* rarely played */
+    --div-mid: #f0efec;
+    --div-pos: #e34948;   /* often played */
+    --ring: rgba(11, 11, 11, 0.10);
+    --f-display: "Russo One", "Arial Black", system-ui, sans-serif;
+    --f-ui: "Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+      --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-ink: #ffffff; --good-ink: #0ca30c;
+      --div-neg: #3987e5; --div-mid: #383835; --div-pos: #e66767; --ring: rgba(255, 255, 255, 0.10);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --plane: #0d0d0d; --surface: #1a1a19; --ink: #f0efec; --ink-2: #c3c2b7; --muted: #898781;
+    --hair: #2c2c2a; --axis: #383835; --accent: #3987e5; --accent-ink: #ffffff; --good-ink: #0ca30c;
+    --div-neg: #3987e5; --div-mid: #383835; --div-pos: #e66767; --ring: rgba(255, 255, 255, 0.10);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body { background: var(--plane); color: var(--ink); font-family: var(--f-ui); font-size: 15px; line-height: 1.5; }
+  .page {
+    max-width: 1080px; margin: 0 auto;
+    padding-block: 28px 48px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    display: grid; gap: 20px;
+  }
+  h1, h2, h3 { margin: 0; text-wrap: balance; }
+  p { margin: 0; }
+  .masthead { display: grid; gap: 8px; padding-block: 4px 8px; }
+  .masthead h1 { font-family: var(--f-display); font-weight: 400; font-size: clamp(28px, 5vw, 44px); line-height: 1.05; letter-spacing: 0.01em; }
+  .masthead .lede { color: var(--ink-2); max-width: 62ch; font-size: 16px; }
+  .status { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+
+  .card { background: var(--surface); border-radius: 14px; box-shadow: 0 0 0 1px var(--ring); padding: 20px; display: grid; gap: 16px; min-width: 0; }
+  .card h2 { font-size: 19px; font-weight: 700; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+  .note { color: var(--ink-2); font-size: 13.5px; max-width: 70ch; }
+  .small { color: var(--muted); font-size: 12.5px; }
+
+  /* slip */
+  .slip-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 20px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: end; gap: 10px 14px; }
+  .field { display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-2); }
+  select, input[type="number"] {
+    font: 500 15px var(--f-ui); color: var(--ink); background: var(--plane); border: 1px solid var(--axis);
+    border-radius: 8px; padding: 7px 10px; min-height: 38px; font-variant-numeric: tabular-nums;
+  }
+  input[type="number"] { width: 110px; }
+  button {
+    font: 600 14px var(--f-ui); color: var(--ink); background: transparent; border: 1px solid var(--axis);
+    border-radius: 8px; padding: 8px 14px; min-height: 38px; cursor: pointer;
+  }
+  button:hover { border-color: var(--muted); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  button.primary:hover { filter: brightness(1.07); }
+  button:disabled { opacity: 0.6; cursor: progress; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .tickets { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .ticket {
+    display: grid; grid-template-columns: 28px auto 1fr auto; align-items: center; gap: 10px 16px;
+    padding: 12px 14px; border-radius: 12px; background: var(--plane);
+  }
+  .ticket .no { font-family: var(--f-display); color: var(--muted); font-size: 15px; }
+  .balls { display: flex; gap: 8px; }
+  .ball {
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    font-family: var(--f-display); font-size: 19px; letter-spacing: 0.02em;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12), 0 0 0 2px var(--surface);
+  }
+  .mults { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--ink-2); }
+  .mults span { background: var(--surface); border-radius: 999px; padding: 3px 10px; box-shadow: 0 0 0 1px var(--ring); font-variant-numeric: tabular-nums; }
+  .mults b { color: var(--ink); font-weight: 600; }
+  .copy { padding: 6px 10px; min-height: 34px; font-size: 13px; }
+  .legend-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; font-size: 12.5px; color: var(--ink-2); }
+  .ramp { width: 140px; height: 10px; border-radius: 5px; }
+
+  /* when to play */
+  .when-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); gap: 24px; align-items: start; }
+  .hero-fig { display: grid; gap: 6px; align-content: start; }
+  .hero-fig .big { font-size: 56px; font-weight: 700; line-height: 1; letter-spacing: -0.01em; }
+  .hero-fig .big small { font-size: 22px; font-weight: 600; color: var(--ink-2); margin-left: 4px; }
+  .hero-fig .what { color: var(--ink-2); max-width: 36ch; }
+  .bars { display: grid; gap: 2px; position: relative; }
+  .bar-row { display: grid; grid-template-columns: 48px 1fr 52px; align-items: center; gap: 10px; min-height: 26px; font-variant-numeric: tabular-nums; font-size: 13.5px; border-radius: 6px; outline-offset: 0; }
+  .bar-row .t { color: var(--ink-2); }
+  .bar-row .v { text-align: right; color: var(--ink-2); }
+  .bar-row.win .v { color: var(--ink); font-weight: 700; }
+  .track { position: relative; height: 26px; }
+  .track .bar { position: absolute; left: 0; top: 6px; height: 14px; background: var(--accent); border-radius: 0 4px 4px 0; }
+  .track .ref { position: absolute; top: -2px; bottom: -2px; width: 1px; background: var(--ink-2); }
+  .bar-row:hover .track .bar, .bar-row:focus-visible .track .bar { filter: brightness(1.12); }
+  .bars-axis { display: grid; grid-template-columns: 48px 1fr 52px; gap: 10px; font-size: 12px; color: var(--muted); }
+  .bars-axis .scale { position: relative; height: 18px; }
+  .bars-axis .scale span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+  .rules { display: grid; gap: 4px; font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+
+  /* evidence columns */
+  .cols { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+  .grid45 { display: grid; grid-template-columns: repeat(10, minmax(0, 1fr)); gap: 4px; max-width: 520px; }
+  .cell {
+    aspect-ratio: 1; max-width: 100%; border-radius: 8px; display: grid; place-items: center;
+    font-family: var(--f-display); font-size: clamp(12px, 2.6vw, 16px); cursor: default;
+  }
+  .cell:hover, .cell:focus-visible { box-shadow: 0 0 0 2px var(--ink); }
+  details { font-size: 13.5px; }
+  summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+  .table-wrap { overflow-x: auto; margin-top: 8px; }
+  table { border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; width: 100%; }
+  th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--hair); white-space: nowrap; }
+  th:first-child, td:first-child { text-align: left; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  tr.ours td { font-weight: 700; }
+  .checks { display: grid; gap: 0; }
+  .check { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--hair); font-size: 14px; }
+  .check:last-child { border-bottom: 0; }
+  .check .val { font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; }
+  .verdict { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14px; }
+  .verdict svg { flex: none; }
+
+  /* history */
+  .dots { display: grid; gap: 4px; }
+  .dot-row { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 66px; align-items: center; gap: 12px; min-height: 30px; font-size: 13.5px; border-radius: 6px; }
+  .dot-row .lab { color: var(--ink-2); }
+  .dot-row.ours .lab, .dot-row.ours .v { color: var(--ink); font-weight: 700; }
+  .dot-row .v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink-2); }
+  .plot { position: relative; height: 30px; }
+  .plot .ci { position: absolute; top: 14px; height: 2px; background: var(--accent); border-radius: 1px; }
+  .plot .pt { position: absolute; top: 9px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
+  .plot .ref { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--ink-2); }
+  .dot-row:hover .pt, .dot-row:focus-visible .pt { transform: scale(1.25); }
+  .dots-axis { display: grid; grid-template-columns: minmax(150px, 220px) 1fr 66px; gap: 12px; font-size: 12px; color: var(--muted); }
+  .dots-axis .scale { position: relative; height: 18px; }
+  .dots-axis .scale span { position: absolute; transform: translateX(-50%); }
+  .progress { height: 6px; border-radius: 3px; background: var(--hair); overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width 0.2s; }
+  .about { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+  .about h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .about p, .about li { color: var(--ink-2); font-size: 14px; }
+  .about ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+  footer { color: var(--muted); font-size: 12.5px; display: grid; gap: 4px; }
+  footer a, .about a { color: var(--accent); }
+
+  .tip {
+    position: fixed; z-index: 30; pointer-events: none; background: var(--surface); color: var(--ink);
+    border-radius: 10px; box-shadow: 0 0 0 1px var(--ring), 0 8px 24px rgba(0, 0, 0, 0.18);
+    padding: 8px 10px; font-size: 13px; line-height: 1.45; max-width: 260px; font-variant-numeric: tabular-nums;
+  }
+  .tip .tv { font-weight: 700; font-size: 15px; }
+  .tip .tl { color: var(--ink-2); }
+
+  @media (max-width: 820px) {
+    .when-top, .cols { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .card { padding: 16px; }
+    .ticket { grid-template-columns: 1fr auto; }
+    .ticket .no { display: none; }
+    .ticket .balls { grid-column: 1 / -1; }
+    .ball { width: 40px; height: 40px; font-size: 17px; }
+    .balls { gap: 6px; }
+    .hero-fig .big { font-size: 48px; }
+    .dot-row, .dots-axis { grid-template-columns: 112px 1fr 56px; gap: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .progress > div { transition: none; } }
+</style>
+
+<main class="page">
+  <header class="masthead">
+    <h1>6 из 45 против толпы</h1>
+    <p class="lede">Числа выпадают равновероятно, а выигрыш за 2, 3 и 4 числа делится между всеми, кто их угадал. Поэтому выгоднее ставить то, что другие игроки берут реже, и играть в тиражах, где ставок мало.</p>
+    <p class="status" id="status"></p>
+  </header>
+
+  <section class="card" id="slip" aria-labelledby="slipTitle">
+    <div class="slip-head">
+      <div>
+        <p class="eyebrow">Следующий тираж</p>
+        <h2 id="slipTitle">Комбинации, которые реже ставят другие</h2>
+      </div>
+      <form class="controls" id="controls">
+        <label class="field" for="nTickets">Комбинаций
+          <select id="nTickets"></select>
+        </label>
+        <label class="field" for="bets">Ставок в один тираж
+          <input type="number" id="bets" min="1" max="100000" step="1" value="1">
+        </label>
+        <button type="button" class="primary" id="reroll">Подобрать другие</button>
+      </form>
+    </div>
+    <ol class="tickets" id="tickets"></ol>
+    <div class="legend-line">
+      <span>Цвет шара — как часто число ставят другие:</span>
+      <span>реже</span><span class="ramp" id="ramp1"></span><span>чаще</span>
+      <span class="small">«×1,13 за 3» — приз за 3 угаданных числа в среднем на 13% больше обычного</span>
+    </div>
+  </section>
+
+  <section class="card" id="when" aria-labelledby="whenTitle">
+    <div>
+      <p class="eyebrow">Когда играть</p>
+      <h2 id="whenTitle">Сколько возвращает ставка в каждом тираже дня</h2>
+    </div>
+    <div class="when-top">
+      <div class="hero-fig" id="heroFig"></div>
+      <div>
+        <div class="bars" id="bars" role="list"></div>
+        <div class="bars-axis" aria-hidden="true"><span></span><div class="scale" id="barsScale"></div><span></span></div>
+      </div>
+    </div>
+    <div class="rules" id="rules"></div>
+  </section>
+
+  <div class="cols">
+    <section class="card" id="crowd" aria-labelledby="crowdTitle">
+      <div>
+        <p class="eyebrow">Что ставят другие</p>
+        <h2 id="crowdTitle">Популярность чисел по числу победителей</h2>
+      </div>
+      <p class="note">Когда выпадает популярное число, победителей больше и приз каждого меньше. Модель обучена на всех тиражах с 2008 года, свежие весят больше.</p>
+      <div class="grid45" id="grid45" role="list"></div>
+      <div class="legend-line"><span>реже ставят</span><span class="ramp" id="ramp2"></span><span>чаще ставят</span><span class="small" id="rampTicks"></span></div>
+      <details><summary>Таблицей</summary><div class="table-wrap" id="crowdTable"></div></details>
+    </section>
+
+    <section class="card" id="random" aria-labelledby="randomTitle">
+      <div>
+        <p class="eyebrow">Случайность тиражей</p>
+        <h2 id="randomTitle">Выпадают ли числа поровну</h2>
+      </div>
+      <div class="verdict" id="verdict"></div>
+      <div class="checks" id="checks"></div>
+      <p class="note">p — вероятность получить такой же или больший разброс при честном розыгрыше. Значения около 0,5 означают, что отклонений нет.</p>
+    </section>
+  </div>
+
+  <section class="card" id="history" aria-labelledby="historyTitle">
+    <div>
+      <p class="eyebrow">Проверка на прошлых тиражах</p>
+      <h2 id="historyTitle">Сколько дал бы метод, если бы им играли с 2013 года</h2>
+    </div>
+    <p class="note" id="historyNote"></p>
+    <div>
+      <div class="dots" id="dots" role="list"></div>
+      <div class="dots-axis" aria-hidden="true"><span></span><div class="scale" id="dotsScale"></div><span></span></div>
+    </div>
+    <p class="small">Точка — выплата за 2–4 числа на билет по нынешним правилам по сравнению со случайными билетами, при теоретической частоте попаданий. Линия — 95% интервал.</p>
+    <details><summary>Все цифры проверки</summary><div class="table-wrap" id="historyTable"></div></details>
+    <div class="controls">
+      <button type="button" id="rerun">Пересчитать в браузере</button>
+      <span class="small" id="rerunNote">Займёт несколько секунд: модель заново обучается на каждом участке истории.</span>
+    </div>
+    <div class="progress" id="progress" hidden><div></div></div>
+  </section>
+
+  <section class="card" aria-labelledby="aboutTitle">
+    <h2 id="aboutTitle">Как это устроено</h2>
+    <div class="about">
+      <div>
+        <h3>Вероятность</h3>
+        <p>Программа проверяет весь архив: частоты чисел, позиций шаров, пар и связь с прошлым тиражом. Каждый прогноз по частотам проверяется тираж за тиражом, только по прошлым данным. Если появится устойчивое смещение, расчёт сам начнёт его учитывать. Пока его нет.</p>
+      </div>
+      <div>
+        <h3>Размер приза</h3>
+        <p>По числу победителей в каждом тираже модель узнаёт, какие числа и сочетания любит толпа: «счастливые» числа, даты, узоры на билете. Комбинации подбираются из того, что ставят реже, без трёх чисел подряд, рядов и столбцов билета.</p>
+      </div>
+      <div>
+        <h3>Важно знать</h3>
+        <ul id="caveats">
+          <li>Правила с делёжкой призов действуют со 2 ноября 2026 года, и постоянная часть фонда может исчезнуть. Таблица выгоды считается по последним тиражам.</li>
+          <li>Возврат — среднее по множеству ставок. Примерно 82% ставок не выигрывают ничего.</li>
+          <li>Налоги на выигрыш в расчёт не входят.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p id="dataNote"></p>
+    <p>Версия для компьютера, которая сама скачивает новые тиражи: <a href="https://github.com/Kuchhh/portf/tree/claude/great-einstein-yw2whu/lotto-6x45" target="_blank" rel="noopener">gosloto645.py на GitHub</a>.</p>
+  </footer>
+</main>
+<div class="tip" id="tip" role="tooltip" hidden></div>
+
+<script>
+/* «6 из 45»: the same method as gosloto645.py, in JavaScript (browser and Node). */
+(function (root) {
+  'use strict';
+
+  // ---------------------------------------------------------------- math helpers
+  function comb(n, k) {
+    if (k < 0 || k > n) return 0;
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = (r * (n - k + i)) / i;
+    return r;
+  }
+  // P(exactly k of the 6 drawn numbers are on one ticket)
+  const H = [];
+  for (let k = 0; k <= 6; k++) H[k] = (comb(6, k) * comb(39, 6 - k)) / comb(45, 6);
+
+  function lgamma(z) {
+    const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+      -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+    if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+    z -= 1;
+    let x = c[0];
+    for (let i = 1; i < 9; i++) x += c[i] / (z + i);
+    const t = z + 7.5;
+    return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+  }
+
+  // upper tail of the chi-square distribution
+  function chi2sf(x, k) {
+    const a = k / 2;
+    x = x / 2;
+    if (x <= 0) return 1;
+    const lg = lgamma(a);
+    if (x < a + 1) {
+      let s = 1 / a, t = 1 / a, n = a;
+      for (let i = 0; i < 2000; i++) {
+        n += 1; t *= x / n; s += t;
+        if (Math.abs(t) < 1e-15 * s) break;
+      }
+      return Math.max(0, 1 - s * Math.exp(-x + a * Math.log(x) - lg));
+    }
+    let b = x + 1 - a, c = 1e300, d = 1 / b, h = d;
+    for (let i = 1; i < 2000; i++) {
+      const an = -i * (i - a);
+      b += 2; d = an * d + b; d = d ? 1 / d : 1e300; c = b + an / c; h *= d * c;
+      if (Math.abs(d * c - 1) < 1e-15) break;
+    }
+    return Math.exp(-x + a * Math.log(x) - lg) * h;
+  }
+
+  // Gaussian elimination with partial pivoting
+  function solve(A, b) {
+    const n = b.length;
+    const M = A.map((row, i) => row.concat([b[i]]));
+    for (let c = 0; c < n; c++) {
+      let p = c;
+      for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      const tmp = M[c]; M[c] = M[p]; M[p] = tmp;
+      const piv = M[c][c];
+      if (Math.abs(piv) < 1e-12) continue;
+      for (let r = c + 1; r < n; r++) {
+        const f = M[r][c] / piv;
+        if (!f) continue;
+        const row = M[r], top = M[c];
+        for (let j = c; j <= n; j++) row[j] -= f * top[j];
+      }
+    }
+    const x = new Array(n).fill(0);
+    for (let i = n - 1; i >= 0; i--) {
+      let s = M[i][n];
+      for (let j = i + 1; j < n; j++) s -= M[i][j] * x[j];
+      x[i] = Math.abs(M[i][i]) > 1e-12 ? s / M[i][i] : 0;
+    }
+    return x;
+  }
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function sampleFrom(pool, k, rng) {
+    const a = pool.slice();
+    for (let i = 0; i < k; i++) {
+      const j = i + Math.floor(rng() * (a.length - i));
+      const t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a.slice(0, k).sort((x, y) => x - y);
+  }
+  const ALL = Array.from({ length: 45 }, (_, i) => i + 1);
+  const sample6 = (rng) => sampleFrom(ALL, 6, rng);
+
+  // ---------------------------------------------------------------- data
+  // compact row: [number, "YYYY-MM-DD HH:MM", b1..b6, columns, price, superprize, w2, w3, w4, w5, d2, d3, d4, d5]
+  function parseDraws(rows) {
+    return rows.map((r) => {
+      const balls = r.slice(2, 8);
+      const s = balls.slice().sort((x, y) => x - y);
+      const f = [0, 0, 0, 0];
+      for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+        const q = pairFeatures(s[i], s[j]);
+        for (let t = 0; t < 4; t++) f[t] += q[t];
+      }
+      return {
+        n: r[0], date: r[1], balls, sorted: s, idx: s.map((x) => x - 1), f,
+        N: r[8] || 0, price: r[9] || 0, sp: r[10] || 0,
+        w: [null, null, r[11], r[12], r[13], r[14]],
+        d: [null, null, r[15], r[16], r[17], r[18]],
+      };
+    });
+  }
+
+  // ---------------------------------------------------------------- 1. are the draws random?
+  function randomnessReport(draws) {
+    const T = draws.length;
+    const cnt = new Array(46).fill(0);
+    for (const d of draws) for (const x of d.balls) cnt[x]++;
+    const E = (T * 6) / 45, fpc = (45 - 6) / (45 - 1);
+    let chi = 0;
+    for (let i = 1; i <= 45; i++) chi += ((cnt[i] - E) ** 2) / E;
+    const out = { draws: T, freqP: chi2sf(chi / fpc, 44), minCount: Math.min(...cnt.slice(1)), maxCount: Math.max(...cnt.slice(1)), expected: E };
+    out.posP = [];
+    for (let pos = 0; pos < 6; pos++) {
+      const c = new Array(46).fill(0);
+      for (const d of draws) c[d.balls[pos]]++;
+      const e = T / 45;
+      let x = 0;
+      for (let i = 1; i <= 45; i++) x += ((c[i] - e) ** 2) / e;
+      out.posP.push(chi2sf(x, 44));
+    }
+    const pc = new Int32Array(46 * 46);
+    for (const d of draws) {
+      const s = d.sorted;
+      for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) pc[s[i] * 46 + s[j]]++;
+    }
+    const ep = (T * 15) / 990;
+    let xp = 0;
+    for (let a = 1; a <= 45; a++) for (let b = a + 1; b <= 45; b++) xp += ((pc[a * 46 + b] - ep) ** 2) / ep;
+    out.pairsP = chi2sf(xp, 989);
+    const ov = [];
+    for (let i = 1; i < T; i++) {
+      const prev = new Set(draws[i - 1].balls);
+      let k = 0;
+      for (const x of draws[i].balls) if (prev.has(x)) k++;
+      ov.push(k);
+    }
+    const m = ov.reduce((s, v) => s + v, 0) / ov.length;
+    const sd = Math.sqrt(ov.reduce((s, v) => s + (v - m) ** 2, 0) / ov.length);
+    out.overlapMean = m;
+    out.overlapZ = (m - 0.8) / (sd / Math.sqrt(ov.length));
+    return out;
+  }
+
+  // Prequential check of frequency forecasts: each draw is forecast only from the draws before it.
+  // A positive total score would be a real, exploitable bias; then p follows that forecast.
+  function biasModel(draws, gate = 10) {
+    let best = null;
+    const table = [];
+    for (const hl of [300, 1000, 3000, null]) {
+      const dec = hl ? Math.pow(0.5, 1 / hl) : 1;
+      for (const a of [450, 4500]) {
+        const c = new Float64Array(46);
+        let n = 0, score = 0;
+        draws.forEach((d, t) => {
+          if (t >= 200) for (const x of d.balls) score += Math.log((45 * (c[x] + a / 45)) / (n + a));
+          if (dec !== 1) { for (let i = 1; i <= 45; i++) c[i] *= dec; n *= dec; }
+          for (const x of d.balls) c[x] += 1;
+          n += 6;
+        });
+        const p = [0];
+        for (let i = 1; i <= 45; i++) p.push((c[i] + a / 45) / (n + a));
+        table.push({ hl, a, score });
+        if (!best || score > best.score) best = { hl, a, score, p };
+      }
+    }
+    const passed = best.score > gate;
+    const uniform = [0].concat(new Array(45).fill(1 / 45));
+    return { p: passed ? best.p : uniform, passed, best: { hl: best.hl, a: best.a, score: best.score }, table };
+  }
+
+  // ---------------------------------------------------------------- 2. what does the crowd play?
+  function pairFeatures(a, b) { // a < b: consecutive, same ten, same last digit, same column of a 9-wide grid
+    return [b - a === 1 ? 1 : 0, Math.floor(a / 10) === Math.floor(b / 10) ? 1 : 0, a % 10 === b % 10 ? 1 : 0, (b - a) % 9 === 0 ? 1 : 0];
+  }
+  const CROWD = { 2: [1500, 0.003], 3: [1500, 0.012], 4: [4000, 0.05] }; // memory half-life in draws, noise floor
+  const NF = 50; // 45 numbers, 4 pair features, intercept
+
+  class CrowdFit {
+    constructor(draws, k) {
+      this.draws = draws; this.k = k;
+      [this.hl, this.floor] = CROWD[k];
+      this.A = new Float64Array(NF * NF);
+      this.b = new Float64Array(NF);
+      this.pos = 0;
+    }
+    advance(end) {
+      const k = this.k;
+      const shrink = Math.pow(0.5, (end - this.pos) / this.hl);
+      if (shrink !== 1) { for (let i = 0; i < NF * NF; i++) this.A[i] *= shrink; for (let i = 0; i < NF; i++) this.b[i] *= shrink; }
+      const ent = new Int32Array(11), val = new Float64Array(11);
+      for (let t = this.pos; t < end; t++) {
+        const d = this.draws[t];
+        const W = d.w[k], N = d.N;
+        if (W === null || W === undefined || N <= 0) continue;
+        const e = N * H[k];
+        const y = Math.log((W + 0.5) / e);
+        const w = Math.pow(0.5, (end - 1 - t) / this.hl) / (1 / e + this.floor);
+        let m = 0;
+        for (const i of d.idx) { ent[m] = i; val[m] = 1; m++; }
+        for (let i = 0; i < 4; i++) if (d.f[i]) { ent[m] = 45 + i; val[m] = d.f[i]; m++; }
+        ent[m] = NF - 1; val[m] = 1; m++;
+        for (let x = 0; x < m; x++) {
+          const j = ent[x], wv = w * val[x], row = j * NF;
+          for (let z = 0; z < m; z++) this.A[row + ent[z]] += wv * val[z];
+          this.b[j] += wv * y;
+        }
+      }
+      this.pos = end;
+    }
+    solve() {
+      const A = [];
+      for (let i = 0; i < NF; i++) A.push(Array.from(this.A.subarray(i * NF, (i + 1) * NF)));
+      for (let j = 0; j < 45; j++) A[j][j] += 50;
+      for (let j = 45; j < 49; j++) A[j][j] += 0.5;
+      const sol = solve(A, Array.from(this.b));
+      return { beta: sol.slice(0, 45), theta: sol.slice(45, 49), mu: sol[49] };
+    }
+  }
+
+  // Scores a ticket: how much more (or less) it is expected to pay per hit than an average ticket.
+  class Crowd {
+    constructor(coefs, p, nNorm = 3000, seed = 7) {
+      this.coefs = coefs;
+      p = p || [0].concat(new Array(45).fill(1 / 45));
+      this.e = {}; this.q = {}; this.beta = {};
+      for (const k of Object.keys(coefs).map(Number)) {
+        const { beta, theta } = coefs[k];
+        const b = [0].concat(beta);
+        this.beta[k] = b;
+        const e = new Float64Array(46);
+        for (let i = 1; i <= 45; i++) e[i] = 45 * p[i] * Math.exp(-b[i]); // chance factor × crowd factor
+        const q = new Float64Array(46 * 46).fill(1);
+        for (let a = 1; a <= 45; a++) for (let c = a + 1; c <= 45; c++) {
+          const f = pairFeatures(a, c);
+          const v = Math.exp(-(theta[0] * f[0] + theta[1] * f[1] + theta[2] * f[2] + theta[3] * f[3]));
+          q[a * 46 + c] = v; q[c * 46 + a] = v;
+        }
+        this.e[k] = e; this.q[k] = q;
+      }
+      this.tiers = Object.keys(coefs).map(Number);
+      this.norm = {};
+      for (const k of this.tiers) this.norm[k] = 1;
+      const rng = mulberry32(seed), acc = {};
+      for (const k of this.tiers) acc[k] = 0;
+      for (let i = 0; i < nNorm; i++) {
+        const g = this.raw(sample6(rng));
+        for (const k of this.tiers) acc[k] += g[k];
+      }
+      for (const k of this.tiers) this.norm[k] = acc[k] / nNorm;
+    }
+    raw(C) {
+      const out = {};
+      for (const k of this.tiers) {
+        const e = this.e[k], q = this.q[k], b = this.beta[k];
+        let sb = 0;
+        for (const x of C) sb += b[x];
+        const rest = Math.exp(((6 - k) / 39) * sb); // the other drawn numbers come from outside the ticket
+        let s = 0;
+        if (k === 2) {
+          for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) s += e[C[i]] * e[C[j]] * q[C[i] * 46 + C[j]];
+          s /= 15;
+        } else if (k === 3) {
+          for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+            const ij = e[C[i]] * e[C[j]] * q[C[i] * 46 + C[j]];
+            for (let l = j + 1; l < 6; l++) s += ij * e[C[l]] * q[C[i] * 46 + C[l]] * q[C[j] * 46 + C[l]];
+          }
+          s /= 20;
+        } else {
+          for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+            const ij = e[C[i]] * e[C[j]] * q[C[i] * 46 + C[j]];
+            for (let l = j + 1; l < 6; l++) {
+              const ijl = ij * e[C[l]] * q[C[i] * 46 + C[l]] * q[C[j] * 46 + C[l]];
+              for (let m = l + 1; m < 6; m++) s += ijl * e[C[m]] * q[C[i] * 46 + C[m]] * q[C[j] * 46 + C[m]] * q[C[l] * 46 + C[m]];
+            }
+          }
+          s /= 15;
+        }
+        out[k] = s * rest;
+      }
+      return out;
+    }
+    mult(C) {
+      const g = this.raw(C), out = {};
+      for (const k of this.tiers) out[k] = g[k] / this.norm[k];
+      return out;
+    }
+  }
+
+  function fitCrowd(draws, end, p, fits) {
+    end = end === undefined || end === null ? draws.length : end;
+    fits = fits || { 2: new CrowdFit(draws, 2), 3: new CrowdFit(draws, 3), 4: new CrowdFit(draws, 4) };
+    const coefs = {};
+    for (const k of [2, 3, 4]) { fits[k].advance(end); coefs[k] = fits[k].solve(); }
+    return { crowd: new Crowd(coefs, p), fits };
+  }
+
+  // ---------------------------------------------------------------- 3. how the prize fund pays right now
+  function prizeRegime(draws, windowSize = 14 * 24) {
+    const sig = (d) => [2, 3, 4, 5].filter((k) => d.w[k] !== null && d.w[k] !== undefined).join(',') + '|' + d.price;
+    const last = sig(draws[draws.length - 1]);
+    let start = draws.length - 1;
+    while (start > 0 && sig(draws[start - 1]) === last) start--;
+    const reg = draws.slice(Math.max(start, draws.length - windowSize)).filter((d) => d.N > 0);
+    const lastDraw = draws[draws.length - 1];
+    const info = { startNumber: draws[start].n, draws: reg.length, price: lastDraw.price, superprize: lastDraw.sp, tiers: {}, slots: {} };
+    for (const k of [2, 3, 4, 5]) {
+      const vals = reg.filter((d) => d.w[k] && d.d[k]).map((d) => d.d[k]);
+      if (!vals.length) continue;
+      const distinct = new Set(vals).size / vals.length;
+      const mean = vals.reduce((s, v) => s + v, 0) / vals.length;
+      const cv = mean ? Math.sqrt(vals.reduce((s, v) => s + (v - mean) ** 2, 0) / vals.length) / mean : 0;
+      const shared = distinct > 0.5 && cv > 0.05;
+      const fixed = vals.slice().sort((x, y) => x - y)[Math.floor(vals.length / 2)];
+      // a shared tier's fund in one draw = fixed part + a share of every bet
+      const xs = reg.map((d) => d.N), ys = reg.map((d) => (d.w[k] || 0) * (d.d[k] || 0));
+      const mx = xs.reduce((s, v) => s + v, 0) / xs.length, my = ys.reduce((s, v) => s + v, 0) / ys.length;
+      let sxx = 0, sxy = 0;
+      xs.forEach((x, i) => { sxx += (x - mx) ** 2; sxy += (x - mx) * (ys[i] - my); });
+      let b = sxx ? sxy / sxx : 0, a = my - b * mx;
+      const perCol = xs.reduce((s, x, i) => s + ys[i] / x, 0) / xs.length;
+      if (!shared || reg.length < 8 || a < 0 || b < 0) { a = 0; b = perCol; }
+      info.tiers[k] = { shared, fixed, perCol, a, b };
+    }
+    const bySlot = {};
+    for (const d of reg) (bySlot[d.date.slice(11, 16)] = bySlot[d.date.slice(11, 16)] || []).push(d);
+    for (const s of Object.keys(bySlot).sort()) {
+      const ds = bySlot[s].slice(-10);
+      const cols = ds.map((d) => d.N).sort((x, y) => x - y);
+      info.slots[s] = { columns: cols[Math.floor(cols.length / 2)], draws: bySlot[s].length };
+    }
+    return info;
+  }
+
+  // expected return of one bet in a draw with `columns` bets: [average ticket, this ticket]
+  function ticketValue(info, mult, columns) {
+    let avg = H[6] * info.superprize, our = avg;
+    for (const k of Object.keys(info.tiers).map(Number)) {
+      const t = info.tiers[k];
+      if (t.shared) {
+        const ev = (t.a + t.b * columns) / columns;
+        avg += ev;
+        our += ev * (mult[k] || 1);
+      } else {
+        avg += H[k] * t.fixed;
+        our += H[k] * t.fixed;
+      }
+    }
+    return [avg, our];
+  }
+
+  // ---------------------------------------------------------------- 4. choosing tickets
+  // skip shapes that pattern players fill in by hand: they make prizes shared more often
+  function acceptable(C, recent) {
+    let run = 1, best = 1;
+    for (let i = 1; i < 6; i++) { run = C[i] - C[i - 1] === 1 ? run + 1 : 1; if (run > best) best = run; }
+    if (best >= 3) return false;
+    const tens = [0, 0, 0, 0, 0];
+    for (const x of C) tens[Math.floor(x / 10)]++;
+    if (Math.max(...tens) >= 4) return false;
+    for (const w of [7, 8, 9, 10]) {
+      const cols = new Array(w).fill(0);
+      for (const x of C) cols[(x - 1) % w]++;
+      if (Math.max(...cols) >= 4) return false;
+    }
+    const ss = new Set(C);
+    for (let i = 0; i < 6; i++) for (let j = i + 1; j < 6; j++) {
+      const a = C[i], st = C[j] - C[i];
+      if (ss.has(a + 2 * st) && ss.has(a + 3 * st)) return false;
+    }
+    for (const r of recent) {
+      let k = 0;
+      for (const x of C) if (r.has(x)) k++;
+      if (k >= 4) return false;
+    }
+    return true;
+  }
+
+  function shared(A, B) { let k = 0; for (const x of A) if (B.includes(x)) k++; return k; }
+
+  // local search over 6-number tickets maximizing `score`; tickets share at most `maxShared` numbers
+  function pickTickets(score, n, recent, rng, restarts = 6, maxShared = 2) {
+    const chosen = [];
+    for (let t = 0; t < n; t++) {
+      let bestC = null, bestS = -Infinity;
+      for (let r = 0; r < restarts; r++) {
+        let C = null;
+        for (let tr = 0; tr < 200; tr++) {
+          const c = sample6(rng);
+          if (acceptable(c, recent) && chosen.every((o) => shared(c, o) <= maxShared)) { C = c; break; }
+        }
+        if (!C) continue;
+        let cur = score(C), improved = true;
+        while (improved) {
+          improved = false;
+          let candS = cur, candC = null;
+          for (let i = 0; i < 6; i++) {
+            const rest = C.slice(0, i).concat(C.slice(i + 1));
+            for (let x = 1; x <= 45; x++) {
+              if (C.includes(x)) continue;
+              const C2 = rest.concat([x]).sort((a, b) => a - b);
+              if (!acceptable(C2, recent) || chosen.some((o) => shared(C2, o) > maxShared)) continue;
+              const s = score(C2);
+              if (s > candS + 1e-12) { candS = s; candC = C2; }
+            }
+          }
+          if (candC) { C = candC; cur = candS; improved = true; }
+        }
+        if (cur > bestS) { bestC = C; bestS = cur; }
+      }
+      if (bestC) chosen.push(bestC);
+    }
+    return chosen;
+  }
+
+  const objective = (crowd, weights) => (C) => {
+    const m = crowd.mult(C);
+    let s = 0;
+    for (const k of Object.keys(weights)) s += weights[k] * m[k];
+    return s;
+  };
+
+  // how much each shared tier contributes to a ticket's value under the current rules
+  function tierWeights(info) {
+    const w = {};
+    for (const k of [2, 3, 4]) if (info.tiers[k] && info.tiers[k].shared) w[k] = info.tiers[k].perCol;
+    return Object.keys(w).length ? w : { 2: 0.2, 3: 0.3, 4: 0.5 };
+  }
+
+  // ---------------------------------------------------------------- everything for the next draw
+  function analyze(draws, opts = {}) {
+    const randomness = randomnessReport(draws);
+    const bias = biasModel(draws);
+    const { crowd } = fitCrowd(draws, draws.length, bias.p);
+    const info = prizeRegime(draws);
+    const recent = draws.slice(-50).map((d) => d.balls.slice());
+    const last = draws[draws.length - 1];
+    const model = { coefs: crowd.coefs, p: bias.p, recent, info };
+    return {
+      status: { count: draws.length, first: { n: draws[0].n, date: draws[0].date }, last: { n: last.n, date: last.date, balls: last.sorted } },
+      randomness, bias: { passed: bias.passed, best: bias.best }, model,
+      tickets: chooseTickets(model, opts.tickets || 10, opts.seed || last.n),
+    };
+  }
+
+  function crowdFromModel(model) { return new Crowd(model.coefs, model.p); }
+
+  function chooseTickets(model, n, seed, crowd) {
+    crowd = crowd || crowdFromModel(model);
+    const recent = model.recent.map((b) => new Set(b));
+    const rng = mulberry32(seed);
+    const list = pickTickets(objective(crowd, tierWeights(model.info)), n, recent, rng, n > 10 ? 2 : 6, n > 20 ? 3 : 2);
+    return list.map((C) => ({ C, mult: crowd.mult(C) }));
+  }
+
+  // ---------------------------------------------------------------- walk-forward test on past draws
+  async function backtest(draws, opts = {}, onProgress) {
+    const start = opts.start || 5000, block = opts.block || 1000, k = opts.k || 10;
+    const rng = mulberry32(opts.seed || 1);
+    const info = prizeRegime(draws);
+    const weights = tierWeights(info);
+    const A = {};
+    for (const m of [2, 3, 4]) if (info.tiers[m]) A[m] = info.tiers[m].perCol / H[m]; // today's prize per expected winner
+    const names = ['anti', 'random', 'popular', 'hot', 'cold'];
+    const blocks = [];
+    let fits = null;
+    const nBlocks = Math.ceil((draws.length - start) / block);
+    for (let b0 = start, bi = 0; b0 < draws.length; b0 += block, bi++) {
+      const fc = fitCrowd(draws, b0, null, fits);
+      fits = fc.fits;
+      const crowd = fc.crowd;
+      const recent = draws.slice(Math.max(0, b0 - 50), b0).map((d) => new Set(d.balls));
+      const obj = objective(crowd, weights);
+      const anti = pickTickets(obj, k, recent, rng, 2);
+      const popular = pickTickets((C) => -obj(C), k, [], rng, 2);
+      const rnd = Array.from({ length: k }, () => sample6(rng));
+      const freq = new Array(46).fill(0);
+      for (const d of draws.slice(Math.max(0, b0 - 300), b0)) for (const x of d.balls) freq[x]++;
+      const order = ALL.slice().sort((a, b) => freq[b] - freq[a]);
+      const hot = Array.from({ length: k }, () => sampleFrom(order.slice(0, 12), 6, rng));
+      const cold = Array.from({ length: k }, () => sampleFrom(order.slice(-12), 6, rng));
+      const sets = { anti, random: rnd, popular, hot, cold };
+      const st = {};
+      for (const s of names) st[s] = { hits: [0, 0, 0, 0, 0, 0, 0], rel: { 2: [0, 0], 3: [0, 0], 4: [0, 0] }, sim: [0, 0], real: [0, 0] };
+      for (let t = b0; t < Math.min(draws.length, b0 + block); t++) {
+        const d = draws[t];
+        const D = new Set(d.balls);
+        const full = d.N > 0 && [2, 3, 4].every((m) => d.w[m] !== null && d.w[m] !== undefined);
+        for (const s of names) {
+          const x = st[s];
+          for (const C of sets[s]) {
+            let m = 0;
+            for (const v of C) if (D.has(v)) m++;
+            x.hits[m]++;
+            if (full) {
+              if (A[m] !== undefined) {
+                const r = (d.N * H[m]) / (d.w[m] + 1);
+                x.sim[0] += A[m] * r;
+                x.rel[m][0] += r; x.rel[m][1] += 1;
+              }
+              x.sim[1] += 1;
+            }
+            if (m >= 2 && m <= 5 && d.d[m] !== null && d.d[m] !== undefined) x.real[0] += d.d[m];
+            x.real[1] += 1;
+          }
+        }
+      }
+      blocks.push(st);
+      if (onProgress) onProgress(bi + 1, nBlocks, draws[b0].n, anti[0]);
+      await new Promise((r) => setTimeout(r, 0));
+    }
+    const agg = (bl, s) => {
+      const hits = [0, 1, 2, 3, 4, 5, 6].map((m) => bl.reduce((t, b) => t + b[s].hits[m], 0));
+      const rel = {};
+      for (const m of [2, 3, 4]) rel[m] = [bl.reduce((t, b) => t + b[s].rel[m][0], 0), bl.reduce((t, b) => t + b[s].rel[m][1], 0)];
+      const sim = bl.reduce((t, b) => t + b[s].sim[0], 0) / Math.max(1, bl.reduce((t, b) => t + b[s].sim[1], 0));
+      const real = bl.reduce((t, b) => t + b[s].real[0], 0) / Math.max(1, bl.reduce((t, b) => t + b[s].real[1], 0));
+      let size = 0; // prize size only, hits at the theoretical rate
+      for (const m of Object.keys(A).map(Number)) size += H[m] * A[m] * (rel[m][0] / Math.max(1, rel[m][1]));
+      return { hits, rel, sim, real, size };
+    };
+    const ci = (key, s) => {
+      const r = mulberry32(3), L = blocks.length, vals = [];
+      for (let i = 0; i < 1000; i++) {
+        const bl = Array.from({ length: L }, () => blocks[Math.floor(r() * L)]);
+        const a = agg(bl, s)[key], b = agg(bl, 'random')[key];
+        vals.push(b ? a / b : 0);
+      }
+      vals.sort((x, y) => x - y);
+      return [vals[25], vals[974]];
+    };
+    const res = { from: draws[start].n, to: draws[draws.length - 1].n, draws: draws.length - start, k, block, strategies: {} };
+    const base = agg(blocks, 'random');
+    for (const s of names) {
+      const a = agg(blocks, s);
+      const n = a.hits.reduce((t, v) => t + v, 0);
+      res.strategies[s] = {
+        hitRate: [2, 3, 4, 5].map((m) => a.hits[m] / n),
+        prize: [2, 3, 4].map((m) => a.rel[m][0] / Math.max(1, a.rel[m][1])),
+        size: a.size, sizeRatio: a.size / base.size, sizeCI: s === 'random' ? [1, 1] : ci('size', s),
+        sim: a.sim, simRatio: a.sim / base.sim, simCI: s === 'random' ? [1, 1] : ci('sim', s),
+        real: a.real, realRatio: a.real / base.real, realCI: s === 'random' ? [1, 1] : ci('real', s),
+      };
+    }
+    res.theory = [2, 3, 4, 5].map((m) => H[m]);
+    return res;
+  }
+
+  const api = { H, comb, chi2sf, solve, mulberry32, sample6, parseDraws, randomnessReport, biasModel, pairFeatures,
+    CrowdFit, Crowd, fitCrowd, prizeRegime, ticketValue, acceptable, pickTickets, objective, tierWeights,
+    analyze, crowdFromModel, chooseTickets, backtest };
+  root.Lotto = api;
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+})(typeof self !== 'undefined' ? self : globalThis);
+
+</script>
+<script>
+(function () {
+  'use strict';
+  const INIT = {"status":{"count":19313,"first":{"n":1,"date":"2008-11-10 08:50"},"last":{"n":19315,"date":"2026-11-04 23:59","balls":[3,27,28,29,35,38]}},"randomness":{"draws":19313,"freqP":0.48017705391248744,"minCount":2492,"maxCount":2672,"expected":2575.0666666666666,"posP":[0.8911143492039976,0.35371999171707297,0.2473212153716235,0.8427520611889694,0.18349338483331135,0.9342997240647108],"pairsP":0.5101339117868063,"overlapMean":0.7942212096106048,"overlapZ":-1.0231973946968973},"bias":{"passed":false,"best":{"hl":300,"a":4500,"score":-37.19129718434381}},"model":{"coefs":{"2":{"beta":[-0.022550610120632093,-0.009785181627661128,0.03205307083138617,0.005277180591772943,0.025200215531912293,0.01228472972691444,0.046333692044408285,0.02735927946660027,0.021503493525395517,0.006157756594337923,0.04328222117636421,0.016318113458779288,0.040727598445904206,0.009315071234493072,0.0035163496038648303,-0.009132169672309242,0.02373828618740693,0.012416572873172733,0.01561434452280068,-0.009929026663416708,0.016125956841805348,0.012287263672548534,0.02710702583041051,-0.007226108764719334,-0.0006675645361493414,0.0003436670329786089,0.01470794963014503,0.006446112907765269,0.002600060446849373,-0.01986054617394173,-0.012985047028469152,-0.02577544105751614,-0.017503442669244685,-0.023626600071590485,-0.021638838618132955,-0.03083941689957491,-0.039014366750632114,-0.0347902892587416,-0.018261735697564743,-0.029799220701877596,-0.010516024006325647,-0.021738961865862817,-0.011820942675358825,-0.012706272877983734,-0.03054820444056826],"theta":[0.0028637694294592238,-0.0023361615411544483,-6.858722609413944e-8,0.0021301655859364173],"mu":0.0002593918371072371},"3":{"beta":[-0.045021367062530085,-0.02178599565928699,0.05045180730217976,0.011302127123653206,0.04545245860676576,0.015123966393780351,0.067512860078702,0.057802422680707774,0.049202453192353106,0.014948653710764216,0.0671750774660338,0.020678244689182664,0.063562366111686,0.007368613880776889,0.004597400190514868,-0.011009450639548656,0.04891075787099249,0.0017157477170579682,0.032705378914174806,-0.0195575558705318,0.041170807838965845,0.024358012164147777,0.042370571146871136,-0.019546041330993347,-0.00023887087899094301,-0.011797310717667847,0.03976748419264901,0.012524850596593569,-0.000798623212635474,-0.022726864109838606,-0.025355932465857347,-0.04505932112131288,-0.012504456870842477,-0.036471338085913026,-0.03250703941733104,-0.04866568305327247,-0.05626971980752522,-0.05339131394873833,-0.0334127891805417,-0.06444310516724627,-0.02311200569795568,-0.03962415605883543,-0.02812340704497829,-0.015765071068620882,-0.05151464339796454],"theta":[-0.01688089953113268,-0.004156954352397823,0.007667982339012223,0.0039036702138974403],"mu":-0.00030230449897840903},"4":{"beta":[-0.09964692266349288,-0.0238360666114499,0.09132219613908692,0.01864349011391615,0.06691035143210053,0.013057898734262907,0.10373616266130374,0.08714556931083747,0.06815244663061952,0.0027496944399981885,0.09657362447442033,0.05323637996470206,0.08969915119824513,0.005821829569875687,0.03340590410751625,-0.0009102894256376172,0.08165216861013457,0.0018365210474845187,0.03737042143156084,-0.0135589172825805,0.05993513103099144,0.029611557531166576,0.05352342343933588,-0.027216178410546396,0.006027021034796523,0.004628772186753006,0.07668695998241339,0.026346225073966036,0.016063242324202268,-0.04087172170048778,-0.04203881538687604,-0.048863329959072034,0.012229834489022557,-0.05406473641637525,-0.06691102890066332,-0.08420603689005225,-0.09475480123656072,-0.0595924185175616,-0.0465043179564657,-0.08228926437889811,-0.06745045898640266,-0.0647298569159782,-0.054713758635361744,-0.05816632623829617,-0.10604073044474736],"theta":[-0.07863465096086311,-0.018949088322558653,0.013864237936844352,0.01234114229647628],"mu":0.031063502709546328}},"p":[0,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223,0.022222222222222223],"recent":[[29,11,40,23,15,2],[25,35,8,21,32,5],[20,7,31,35,40,2],[8,39,16,30,11,19],[23,3,17,22,33,45],[22,23,45,12,44,34],[33,17,2,7,15,27],[45,8,25,30,31,12],[5,42,37,23,6,8],[3,21,23,45,9,19],[11,37,45,15,33,6],[17,44,37,38,31,11],[5,19,15,22,32,27],[7,25,10,31,20,9],[7,37,39,36,13,4],[19,1,37,13,20,33],[39,44,24,6,22,12],[28,23,13,11,24,33],[27,30,13,26,12,2],[25,21,37,12,39,29],[13,20,17,42,41,36],[34,20,18,3,28,31],[29,6,14,18,17,20],[39,14,26,35,20,17],[24,22,39,16,11,27],[44,29,18,6,2,28],[39,36,3,2,14,19],[38,5,25,39,36,32],[33,41,9,1,5,18],[10,14,3,28,43,45],[16,1,8,29,22,28],[33,23,2,42,8,5],[33,12,2,40,20,30],[3,33,20,32,34,43],[33,17,43,8,26,10],[28,27,21,34,1,29],[25,10,32,19,31,15],[20,19,36,45,16,12],[7,22,26,5,2,15],[40,7,6,43,37,13],[28,26,4,39,29,10],[33,29,25,41,23,7],[21,42,14,38,32,30],[43,44,9,45,31,22],[6,9,34,5,32,2],[2,17,21,20,6,28],[10,16,12,19,40,20],[10,3,7,19,11,13],[3,11,35,45,1,30],[29,27,35,28,3,38]],"info":{"startNumber":19282,"draws":34,"price":70,"superprize":57591271,"tiers":{"2":{"shared":true,"fixed":145,"perCol":26.346865397335414,"a":213296.38418376024,"b":10.552886843528524},"3":{"shared":true,"fixed":706,"perCol":16.819673428353315,"a":57607.56438592888,"b":12.541134164668646},"4":{"shared":true,"fixed":4250,"perCol":5.742236926750207,"a":14989.298570101295,"b":4.6129217722605285},"5":{"shared":false,"fixed":140000,"perCol":3.8265766262872916,"a":0,"b":3.8265766262872916}},"slots":{"11:00":{"columns":42802,"draws":3},"12:30":{"columns":20608,"draws":3},"14:25":{"columns":22880,"draws":3},"14:40":{"columns":9815,"draws":3},"14:55":{"columns":8910,"draws":3},"17:30":{"columns":27775,"draws":3},"19:25":{"columns":23866,"draws":3},"19:40":{"columns":7543,"draws":3},"19:55":{"columns":8112,"draws":3},"23:00":{"columns":29275,"draws":3},"23:59":{"columns":10241,"draws":4}}}},"tickets":[{"C":[36,37,39,40,44,45],"mult":{"2":1.037871701015033,"3":1.1345194596235928,"4":1.4816436605522838}},{"C":[1,37,38,42,43,45],"mult":{"2":1.0375796984161463,"3":1.1304842489845943,"4":1.4206064826300562}},{"C":[34,35,38,40,41,45],"mult":{"2":1.0357558390075428,"3":1.1256357660484757,"4":1.403908667751532}},{"C":[32,35,36,40,42,43],"mult":{"2":1.0335144865404802,"3":1.1241237077186517,"4":1.374835236055509}},{"C":[1,2,34,36,37,41],"mult":{"2":1.0318435400949493,"3":1.108768439091103,"4":1.367067876834738}},{"C":[1,31,32,34,44,45],"mult":{"2":1.0299979403275727,"3":1.1021784312709126,"4":1.3525707083019805}},{"C":[30,31,37,40,41,43],"mult":{"2":1.0292331695024077,"3":1.1036352610840803,"4":1.3435905953706617}},{"C":[1,33,34,39,40,42],"mult":{"2":1.031087517949193,"3":1.1104940234282916,"4":1.300365729004524}},{"C":[24,25,32,37,38,40],"mult":{"2":1.0322935558537591,"3":1.1151135749856265,"4":1.2849141686288352}},{"C":[20,34,35,37,43,44],"mult":{"2":1.027516995106968,"3":1.0880409305166632,"4":1.2933641035019732}}],"backtest":{"from":5001,"to":19315,"draws":14313,"k":10,"block":1000,"strategies":{"anti":{"hitRate":[0.15244882274855026,0.023614895549500452,0.0016209040732201496,0.00003493327744008943],"prize":[1.0382895319455623,1.143886983353218,1.4905416776835338],"size":55.15452350303207,"sizeRatio":1.0978673339260212,"sizeCI":[1.0836392985448726,1.1115026645739021],"sim":58.06093624048774,"simRatio":1.1710343997100883,"simCI":[1.1156394872104585,1.2161874026439834],"real":23.893069237755885,"realRatio":1.0867005129694554,"realCI":[0.9905883168651791,1.1967940727056272]},"random":{"hitRate":[0.15000349332774401,0.022497030671417593,0.0013134912317473626,0.000027946621952071543],"prize":[1.0056969083485392,1.0175145047690837,1.154019557476298],"size":50.23787647073631,"sizeRatio":1,"sizeCI":[1,1],"sim":49.58089724337887,"simRatio":1,"simCI":[1,1],"real":21.986802207783136,"realRatio":1,"realCI":[1,1]},"popular":{"hitRate":[0.14943757423321455,0.022056871375672464,0.001278557954307273,0.000041919932928107315],"prize":[0.9719427320561109,0.9016461614349198,0.8172868077574906],"size":45.466092805915345,"sizeRatio":0.9050162148553285,"sizeCI":[0.8922288303680017,0.9150764317525572],"sim":44.62811975785655,"simRatio":0.9001071428536175,"simCI":[0.8585124116650128,0.9409772290093056],"real":23.85086285195277,"realRatio":1.0847808893059387,"realCI":[0.960318980537604,1.2255247680911818]},"hot":{"hitRate":[0.15167330398938028,0.023712708726332705,0.0014811709634597917,0.000020959966464053657],"prize":[1.005478112316405,1.0225931683190346,1.0383851147074072],"size":49.65353297621914,"sizeRatio":0.9883684674678168,"sizeCI":[0.9725106614309375,1.0014674318978256],"sim":50.6533497368535,"simRatio":1.0216303567119864,"simCI":[0.9633994379947602,1.0751021403456003],"real":23.470970446447286,"realRatio":1.0675026875049054,"realCI":[0.9880769773534663,1.1726589224926922]},"cold":{"hitRate":[0.15129602459302732,0.021966044854328234,0.001229651365891148,0.00003493327744008943],"prize":[1.0066962408668727,1.0286239523791127,1.11233961526069],"size":50.21172692755883,"sizeRatio":0.9994794854994973,"sizeCI":[0.9788442438050199,1.0198887041593339],"sim":50.19197583164619,"simRatio":1.0123248795855329,"simCI":[0.96650190783124,1.0592256629250092],"real":22.982959547264723,"realRatio":1.045307058755864,"realCI":[0.9629199641542313,1.1642835257057298]}},"theory":[0.15147402229081186,0.02244059589493509,0.0013646308314487555,0.00002872907013576327]},"built":"2026-11-04 21:58"};
+  const L = window.Lotto;
+  const $ = (id) => document.getElementById(id);
+  const nf0 = new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 });
+  const dec = (x, d = 2) => x.toFixed(d).replace('.', ',').replace('-', '−');
+  const int = (x) => nf0.format(Math.round(x));
+  const dateRu = (s) => s.slice(8, 10) + '.' + s.slice(5, 7) + '.' + s.slice(0, 4) + ', ' + s.slice(11, 16);
+  const STRAT = { anti: 'Против толпы (этот метод)', random: 'Случайные билеты', popular: 'Самые популярные', hot: '«Горячие» числа', cold: '«Холодные» числа' };
+
+  const state = { n: 3, bets: 1, tickets: INIT.tickets, seed: null, backtest: INIT.backtest };
+  try { const s = JSON.parse(localStorage.getItem('six45') || '{}'); if (s.n) state.n = s.n; if (s.bets) state.bets = s.bets; } catch (e) {}
+  const remember = () => { try { localStorage.setItem('six45', JSON.stringify({ n: state.n, bets: state.bets })); } catch (e) {} };
+
+  let crowd = null;
+  const getCrowd = () => crowd || (crowd = L.crowdFromModel(INIT.model));
+
+  // ---------------- colour: diverging blue ↔ grey ↔ red, interpolated in OKLab
+  function hexToRgb(h) { h = h.trim().replace('#', ''); return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255); }
+  const toLin = (c) => (c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  const toSrgb = (c) => (c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055);
+  function oklab(hex) {
+    const [r, g, b] = hexToRgb(hex).map(toLin);
+    const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+    const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+    const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+    return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s, 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s];
+  }
+  function fromOklab([L_, a, b]) {
+    const l = (L_ + 0.3963377774 * a + 0.2158037573 * b) ** 3, m = (L_ - 0.1055613458 * a - 0.0638541728 * b) ** 3, s = (L_ - 0.0894841775 * a - 1.291485548 * b) ** 3;
+    const rgb = [4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s, -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s, -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s];
+    return rgb.map((c) => Math.min(1, Math.max(0, toSrgb(c))));
+  }
+  const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  let PAL = null;
+  function palette() {
+    PAL = { neg: oklab(css('--div-neg')), mid: oklab(css('--div-mid')), pos: oklab(css('--div-pos')) };
+  }
+  function divColor(t) { // t in [-1, 1]: −1 rarely played, +1 often played
+    const pole = t < 0 ? PAL.neg : PAL.pos, u = Math.min(1, Math.abs(t));
+    const c = fromOklab(PAL.mid.map((v, i) => v + (pole[i] - v) * u));
+    const lum = c.map(toLin).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+    return { bg: 'rgb(' + c.map((v) => Math.round(v * 255)).join(',') + ')', fg: lum > 0.36 ? '#0b0b0b' : '#ffffff' };
+  }
+  const beta3 = INIT.model.coefs[3].beta; // effect of a drawn number on log(winners of 3)
+  const vmax = Math.max(...beta3.map(Math.abs));
+  const popT = (x) => beta3[x - 1] / vmax;
+  const popPct = (x) => (Math.exp(beta3[x - 1]) - 1) * 100;
+  function rampCss() {
+    const stops = [-1, -0.5, 0, 0.5, 1].map((t) => divColor(t).bg);
+    return 'linear-gradient(90deg,' + stops.join(',') + ')';
+  }
+
+  // ---------------- tooltip
+  const tip = $('tip');
+  function showTip(el, rows, ev) {
+    tip.replaceChildren();
+    rows.forEach(([cls, text]) => { const d = document.createElement('div'); d.className = cls; d.textContent = text; tip.appendChild(d); });
+    tip.hidden = false;
+    const r = el.getBoundingClientRect();
+    const x = ev && ev.clientX !== undefined ? ev.clientX : r.left + r.width / 2;
+    const y = ev && ev.clientY !== undefined ? ev.clientY : r.top;
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x + 12)) + 'px';
+    tip.style.top = Math.max(8, y - h - 12 < 8 ? y + 18 : y - h - 12) + 'px';
+  }
+  const hideTip = () => { tip.hidden = true; };
+  function bindTip(el, rows) {
+    el.addEventListener('pointermove', (e) => showTip(el, rows(), e));
+    el.addEventListener('pointerleave', hideTip);
+    el.addEventListener('focus', () => showTip(el, rows()));
+    el.addEventListener('blur', hideTip);
+  }
+
+  // ---------------- header
+  function renderStatus() {
+    const s = INIT.status;
+    $('status').textContent = 'Архив: ' + int(s.count) + ' тиражей, с №' + s.first.n + ' (' + dateRu(s.first.date).slice(0, 10) + ') по №' + s.last.n + ' (' + dateRu(s.last.date) + '). Последний: ' + s.last.balls.join(' ') + '.';
+    $('dataNote').textContent = 'Данные: архив тиражей «6 из 45» на stoloto.ru, по тираж №' + s.last.n + ' включительно. Расчёт обновляется вместе с архивом страницы.';
+  }
+
+  // ---------------- slip
+  function renderTickets() {
+    const list = $('tickets');
+    list.replaceChildren();
+    state.tickets.slice(0, state.n).forEach((t, i) => {
+      const li = document.createElement('li');
+      li.className = 'ticket';
+      const no = document.createElement('span'); no.className = 'no'; no.textContent = i + 1;
+      const balls = document.createElement('div'); balls.className = 'balls';
+      t.C.forEach((x) => {
+        const b = document.createElement('span'); b.className = 'ball'; b.textContent = x;
+        const c = divColor(popT(x)); b.style.background = c.bg; b.style.color = c.fg;
+        b.title = x + ': ' + (popPct(x) < 0 ? 'ставят реже среднего' : 'ставят чаще среднего');
+        balls.appendChild(b);
+      });
+      const m = document.createElement('div'); m.className = 'mults';
+      [2, 3, 4].forEach((k) => {
+        const s = document.createElement('span');
+        s.append('за ' + k + ' ');
+        const bb = document.createElement('b'); bb.textContent = '×' + dec(t.mult[k]); s.appendChild(bb);
+        m.appendChild(s);
+      });
+      const cp = document.createElement('button'); cp.type = 'button'; cp.className = 'copy'; cp.textContent = 'Скопировать';
+      cp.addEventListener('click', () => {
+        const text = t.C.join(' ');
+        const done = () => { cp.textContent = 'Скопировано'; setTimeout(() => { cp.textContent = 'Скопировать'; }, 1500); };
+        try {
+          navigator.clipboard.writeText(text).then(done, () => selectText(balls));
+        } catch (e) { selectText(balls); }
+      });
+      li.append(no, balls, m, cp);
+      list.appendChild(li);
+    });
+  }
+  function selectText(el) { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); }
+
+  // ---------------- when to play
+  function renderWhen() {
+    const info = INIT.model.info, price = info.price;
+    const mult = state.tickets[0].mult;
+    const rows = Object.entries(info.slots).map(([slot, v]) => {
+      const [avg, our] = L.ticketValue(info, mult, v.columns + state.bets);
+      return { slot, cols: v.columns, avg: avg / price, our: our / price };
+    });
+    const best = rows.reduce((a, b) => (b.our > a.our ? b : a));
+    const worst = rows.reduce((a, b) => (b.our < a.our ? b : a));
+    const hf = $('heroFig');
+    hf.replaceChildren();
+    const big = document.createElement('div'); big.className = 'big';
+    big.append(dec(best.our));
+    const sm = document.createElement('small'); sm.textContent = '₽ на 1 ₽'; big.appendChild(sm);
+    const what = document.createElement('p'); what.className = 'what';
+    what.textContent = 'в среднем возвращает ставка с комбинацией №1 в тираже ' + best.slot + '. Обычный билет там же — ' + dec(best.avg) + ' ₽, а в тираже ' + worst.slot + ' — ' + dec(worst.avg) + ' ₽.';
+    const tail = document.createElement('p'); tail.className = 'small';
+    tail.textContent = state.bets > 1 ? 'С учётом ваших ' + int(state.bets) + ' ставок в одном тираже.' : 'Ставок в тираже: по последним 10 тиражам этого времени.';
+    hf.append(big, what, tail);
+
+    const max = Math.max(1.3, ...rows.map((r) => r.our)) * 1.05;
+    const bars = $('bars');
+    bars.replaceChildren();
+    rows.forEach((r) => {
+      const row = document.createElement('div');
+      row.className = 'bar-row' + (r.our >= 1 ? ' win' : '');
+      row.setAttribute('role', 'listitem'); row.tabIndex = 0;
+      row.setAttribute('aria-label', 'Тираж ' + r.slot + ': ' + dec(r.our) + ' ₽ на 1 ₽ ставки, обычный билет ' + dec(r.avg));
+      const t = document.createElement('span'); t.className = 't'; t.textContent = r.slot;
+      const tr = document.createElement('div'); tr.className = 'track';
+      const bar = document.createElement('div'); bar.className = 'bar'; bar.style.width = (r.our / max) * 100 + '%';
+      const ref = document.createElement('div'); ref.className = 'ref'; ref.style.left = (1 / max) * 100 + '%';
+      tr.append(bar, ref);
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = dec(r.our);
+      row.append(t, tr, v);
+      bindTip(row, () => [['tv', dec(r.our) + ' ₽ на 1 ₽'], ['tl', 'тираж в ' + r.slot + ', комбинация №1'], ['tl', 'обычный билет: ' + dec(r.avg) + ' ₽'], ['tl', 'ставок в тираже ≈ ' + int(r.cols)]]);
+      bars.appendChild(row);
+    });
+    const sc = $('barsScale');
+    sc.replaceChildren();
+    [0, 0.5, 1].forEach((v) => { const s = document.createElement('span'); s.style.left = (v / max) * 100 + '%'; s.textContent = v === 1 ? '1 ₽ — окупается' : dec(v, v ? 1 : 0); sc.appendChild(s); });
+
+    const rules = $('rules');
+    rules.replaceChildren();
+    const head = document.createElement('p');
+    head.textContent = 'Правила сейчас (с тиража №' + info.startNumber + '): ставка ' + price + ' ₽, суперприз ' + int(info.superprize) + ' ₽.';
+    rules.appendChild(head);
+    Object.entries(info.tiers).forEach(([k, t]) => {
+      const p = document.createElement('p');
+      p.textContent = 'Угадано ' + k + ': ' + (t.shared ? 'приз делится между победителями, фонд ≈ ' + int(t.a) + ' ₽ + ' + dec(t.b) + ' ₽ с каждой ставки тиража' : 'фиксированный приз ' + int(t.fixed) + ' ₽') + '.';
+      rules.appendChild(p);
+    });
+  }
+
+  // ---------------- crowd grid
+  function renderCrowd() {
+    const g = $('grid45');
+    g.replaceChildren();
+    for (let x = 1; x <= 45; x++) {
+      const c = document.createElement('div');
+      c.className = 'cell'; c.textContent = x; c.tabIndex = 0; c.setAttribute('role', 'listitem');
+      const col = divColor(popT(x)); c.style.background = col.bg; c.style.color = col.fg;
+      const pct = popPct(x);
+      c.setAttribute('aria-label', x + ': победителей на ' + dec(Math.abs(pct), 1) + '% ' + (pct < 0 ? 'меньше' : 'больше') + ' среднего');
+      bindTip(c, () => [['tv', (pct < 0 ? '−' : '+') + dec(Math.abs(pct), 1) + '%'], ['tl', 'победителей за 3 числа, когда выпадает ' + x], ['tl', pct < 0 ? 'ставят реже среднего' : 'ставят чаще среднего']]);
+      g.appendChild(c);
+    }
+    $('ramp1').style.background = rampCss();
+    $('ramp2').style.background = rampCss();
+    const mx = (Math.exp(vmax) - 1) * 100;
+    $('rampTicks').textContent = 'от −' + dec(mx, 1) + '% до +' + dec(mx, 1) + '% победителей';
+    const order = Array.from({ length: 45 }, (_, i) => i + 1).sort((a, b) => popPct(a) - popPct(b));
+    const tbl = document.createElement('table');
+    tbl.innerHTML = '<thead><tr><th>Число</th><th>Победителей за 3 числа</th><th>Победителей за 2 числа</th></tr></thead>';
+    const tb = document.createElement('tbody');
+    const b2 = INIT.model.coefs[2].beta;
+    order.forEach((x) => {
+      const tr = document.createElement('tr');
+      [String(x), (popPct(x) < 0 ? '−' : '+') + dec(Math.abs(popPct(x)), 1) + '%', ((Math.exp(b2[x - 1]) - 1) * 100 < 0 ? '−' : '+') + dec(Math.abs((Math.exp(b2[x - 1]) - 1) * 100), 1) + '%']
+        .forEach((v) => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+    tbl.appendChild(tb);
+    $('crowdTable').replaceChildren(tbl);
+  }
+
+  // ---------------- randomness
+  function renderRandom() {
+    const r = INIT.randomness, b = INIT.bias;
+    const v = $('verdict');
+    v.replaceChildren();
+    v.innerHTML = '<svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><circle cx="9" cy="9" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.2 9.3l2.4 2.4 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const s = document.createElement('span');
+    s.textContent = b.passed ? 'Найдено устойчивое смещение, оно учтено' : 'Отклонений нет: числа выпадают равновероятно';
+    v.appendChild(s);
+    v.style.color = 'var(--good-ink)';
+    const rows = [
+      ['Частоты 45 чисел', 'p = ' + dec(r.freqP, 3)],
+      ['Частоты по позиции шара (1-й…6-й)', 'p от ' + dec(Math.min(...r.posP), 3) + ' до ' + dec(Math.max(...r.posP), 3)],
+      ['Частоты 990 пар чисел', 'p = ' + dec(r.pairsP, 3)],
+      ['Совпадение с прошлым тиражом', dec(r.overlapMean, 3) + ' при теории 0,800'],
+      ['Лучший прогноз по частотам, тираж за тиражом', dec(b.best.score, 1) + ' нат к равным шансам'],
+      ['Выпадений самого редкого и частого числа', int(r.minCount) + ' и ' + int(r.maxCount) + ' при ожидании ' + int(r.expected)],
+    ];
+    const box = $('checks');
+    box.replaceChildren();
+    rows.forEach(([a, val]) => {
+      const d = document.createElement('div'); d.className = 'check';
+      const x = document.createElement('span'); x.textContent = a;
+      const y = document.createElement('span'); y.className = 'val'; y.textContent = val;
+      d.append(x, y); box.appendChild(d);
+    });
+  }
+
+  // ---------------- history
+  function renderHistory() {
+    const bt = state.backtest;
+    $('historyNote').textContent = int(bt.draws) + ' тиражей (№' + bt.from + '–№' + bt.to + '). На каждом участке в ' + int(bt.block) + ' тиражей модель знала только прошлое и выставляла по ' + bt.k + ' билетов каждой стратегии. Выплаты пересчитаны по нынешним правилам по фактическому числу победителей.';
+    const order = ['anti', 'random', 'hot', 'cold', 'popular'];
+    const lo = Math.min(...order.map((s) => bt.strategies[s].sizeCI[0])), hi = Math.max(...order.map((s) => bt.strategies[s].sizeCI[1]));
+    const a = Math.floor((Math.min(lo, 0.95) - 0.02) * 20) / 20, b = Math.ceil((Math.max(hi, 1.05) + 0.02) * 20) / 20;
+    const pos = (v) => ((v - a) / (b - a)) * 100 + '%';
+    const box = $('dots');
+    box.replaceChildren();
+    order.forEach((s) => {
+      const x = bt.strategies[s];
+      const row = document.createElement('div');
+      row.className = 'dot-row' + (s === 'anti' ? ' ours' : '');
+      row.setAttribute('role', 'listitem'); row.tabIndex = 0;
+      row.setAttribute('aria-label', STRAT[s] + ': ×' + dec(x.sizeRatio, 3));
+      const lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = STRAT[s];
+      const plot = document.createElement('div'); plot.className = 'plot';
+      const ref = document.createElement('div'); ref.className = 'ref'; ref.style.left = pos(1);
+      const ci = document.createElement('div'); ci.className = 'ci'; ci.style.left = pos(x.sizeCI[0]);
+      ci.style.width = 'calc(' + pos(x.sizeCI[1]) + ' - ' + pos(x.sizeCI[0]) + ')';
+      const pt = document.createElement('div'); pt.className = 'pt'; pt.style.left = pos(x.sizeRatio);
+      plot.append(ref, ci, pt);
+      const v = document.createElement('span'); v.className = 'v'; v.textContent = '×' + dec(x.sizeRatio, 3);
+      row.append(lab, plot, v);
+      bindTip(row, () => [['tv', '×' + dec(x.sizeRatio, 3)], ['tl', STRAT[s]], ['tl', '95% интервал: ' + dec(x.sizeCI[0], 3) + '…' + dec(x.sizeCI[1], 3)], ['tl', 'на билет ≈ ' + dec(x.size, 1) + ' ₽ за 2–4 числа']]);
+      box.appendChild(row);
+    });
+    const sc = $('dotsScale');
+    sc.replaceChildren();
+    for (let i = Math.ceil(a * 10); i <= Math.floor(b * 10); i++) {
+      const s = document.createElement('span'); s.style.left = pos(i / 10); s.textContent = dec(i / 10, 1); sc.appendChild(s);
+    }
+    const t = document.createElement('table');
+    t.innerHTML = '<thead><tr><th>Стратегия</th><th>угадано 2</th><th>угадано 3</th><th>угадано 4</th><th>приз за 2</th><th>приз за 3</th><th>приз за 4</th><th>выплата*</th><th>с фактическими попаданиями</th><th>по правилам тех лет</th></tr></thead>';
+    const tb = document.createElement('tbody');
+    const th = document.createElement('tr');
+    ['Теория', ...bt.theory.slice(0, 3).map((v) => dec(v, 5)), '1,000', '1,000', '1,000', '', '', ''].forEach((v) => { const td = document.createElement('td'); td.textContent = v; th.appendChild(td); });
+    tb.appendChild(th);
+    order.forEach((s) => {
+      const x = bt.strategies[s];
+      const tr = document.createElement('tr');
+      if (s === 'anti') tr.className = 'ours';
+      [STRAT[s], ...x.hitRate.slice(0, 3).map((v) => dec(v, 5)), ...x.prize.map((v) => dec(v, 3)), '×' + dec(x.sizeRatio, 3), '×' + dec(x.simRatio, 3), '×' + dec(x.realRatio, 3)]
+        .forEach((v) => { const td = document.createElement('td'); td.textContent = v; tr.appendChild(td); });
+      tb.appendChild(tr);
+    });
+    t.appendChild(tb);
+    const foot = document.createElement('p'); foot.className = 'small';
+    foot.textContent = 'Доли угаданных билетов у всех стратегий совпадают с теорией в пределах случайного разброса. «Приз» — средний приз при выигрыше относительно среднего тиража. * Выплата за 2–4 числа по нынешним правилам при теоретической частоте попаданий, относительно случайных билетов. По правилам тех лет призы чаще были фиксированными, поэтому преимущества там нет.';
+    $('historyTable').replaceChildren(t, foot);
+  }
+
+  // ---------------- controls
+  const sel = $('nTickets');
+  for (let i = 1; i <= 10; i++) { const o = document.createElement('option'); o.value = i; o.textContent = i; sel.appendChild(o); }
+  sel.value = String(state.n);
+  $('bets').value = String(state.bets);
+  sel.addEventListener('change', () => {
+    state.n = Number(sel.value); remember();
+    if (state.tickets.length < state.n) recompute(); else renderTickets();
+  });
+  $('bets').addEventListener('input', () => {
+    const v = Math.max(1, Math.min(100000, Math.round(Number($('bets').value) || 1)));
+    state.bets = v; remember(); renderWhen();
+  });
+  $('controls').addEventListener('submit', (e) => e.preventDefault());
+  $('reroll').addEventListener('click', () => { state.seed = Math.floor(Math.random() * 1e9); recompute(); });
+  function recompute() {
+    const btn = $('reroll');
+    btn.disabled = true; btn.textContent = 'Подбираю…';
+    setTimeout(() => {
+      state.tickets = L.chooseTickets(INIT.model, Math.max(state.n, 3), state.seed || INIT.status.last.n, getCrowd());
+      btn.disabled = false; btn.textContent = 'Подобрать другие';
+      renderTickets(); renderWhen();
+    }, 20);
+  }
+
+  let drawsCache = null;
+  $('rerun').addEventListener('click', async () => {
+    const btn = $('rerun'), bar = $('progress'), note = $('rerunNote');
+    btn.disabled = true; bar.hidden = false; bar.firstElementChild.style.width = '0%';
+    try {
+      if (!drawsCache) {
+        note.textContent = 'Загружаю архив…';
+        const r = await fetch('draws.json');
+        if (!r.ok) throw new Error('архив не загрузился (' + r.status + ')');
+        drawsCache = L.parseDraws((await r.json()).rows);
+      }
+      const res = await L.backtest(drawsCache, { start: 5000, block: 1000, k: 10, seed: Math.floor(Math.random() * 1e9) }, (i, n, num) => {
+        bar.firstElementChild.style.width = (i / n) * 100 + '%';
+        note.textContent = 'Участок ' + i + ' из ' + n + ' (с тиража №' + num + ')…';
+      });
+      state.backtest = res;
+      renderHistory();
+      note.textContent = 'Пересчитано заново: случайные билеты и старт поиска другие, поэтому цифры немного отличаются от прошлого расчёта.';
+    } catch (e) {
+      note.textContent = 'Не получилось пересчитать: ' + e.message + '. Обновите страницу и попробуйте ещё раз.';
+    }
+    btn.disabled = false; bar.hidden = true;
+  });
+
+  function renderAll() {
+    palette();
+    renderStatus(); renderTickets(); renderWhen(); renderCrowd(); renderRandom(); renderHistory();
+  }
+  renderAll();
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  if (mq.addEventListener) mq.addEventListener('change', renderAll);
+  new MutationObserver(renderAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+  window.addEventListener('scroll', hideTip, { passive: true });
+})();
+</script>
