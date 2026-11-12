@@ -1,0 +1,5 @@
+__pycache__/
+*.tmp
+# local builds of the page; the published copy lives in /rapido2
+web/index.html
+web/state.json
