@@ -264,6 +264,7 @@
     <p class="lede">Шанс угадать пять чисел одинаков у любой комбинации: генератор проверен на всём архиве и честен. На главные призы влияет одно — когда играть. Чем больше суперприз, тем больше в среднем возвращает ставка.</p>
     <p class="status" id="status"></p>
     <p class="live" id="live">Проверяю новые тиражи…</p>
+    <div class="upd" id="upd"></div>
   </header>
 
   <section class="card" id="now" aria-labelledby="nowTitle">
@@ -721,11 +722,88 @@
   }
 
   renderStatus(); renderNow(); renderTickets(); renderCalc(); renderHistory(); renderRandom(); renderCrowd();
+  window.lottoRefresh = refresh; window.lottoLast = () => S.last.n;
   refresh();
   setInterval(() => { if (!document.hidden) refresh(); }, 5 * 60 * 1000);
   setInterval(() => { if (!document.hidden) renderNow(); }, 30 * 1000);
   document.addEventListener('visibilitychange', () => { if (!document.hidden) { renderNow(); refresh(); } });
   window.addEventListener('scroll', hideTip, { passive: true });
+})();
+</script>
+<style>
+  .upd { display: grid; gap: 8px; font-size: 13px; color: var(--ink-2); }
+  .upd-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .upd button { min-height: 34px; padding: 6px 12px; font-size: 13px; }
+  .upd .linkish { border: 0; padding: 0; min-height: 0; color: var(--accent); background: none; font-weight: 500; text-decoration: underline; }
+  .upd form { display: grid; gap: 8px; padding: 12px; border-radius: 12px; background: var(--surface); box-shadow: 0 0 0 1px var(--ring); max-width: 560px; }
+  .upd input { font: 500 14px var(--f-ui); color: var(--ink); background: var(--plane); border: 1px solid var(--axis); border-radius: 8px; padding: 7px 10px; min-height: 38px; width: 100%; }
+  .upd ol { margin: 0; padding-left: 18px; display: grid; gap: 2px; }
+  .upd a { color: var(--accent); }
+</style>
+<script>
+/* "Update data" button: starts the update workflow on GitHub with the visitor's own access key.
+   The key is kept only in this browser (localStorage) and is sent only to api.github.com. */
+(() => {
+  'use strict';
+  const box = document.getElementById('upd');
+  if (!box) return;
+  const REPO = 'Kuchhh/portf', KEY = 'lottoKey';
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  const getKey = () => { try { return localStorage.getItem(KEY) || ''; } catch (e) { return ''; } };
+  const setKey = (v) => { try { v ? localStorage.setItem(KEY, v) : localStorage.removeItem(KEY); } catch (e) {} };
+  const row = el('div', 'upd-row'), btn = el('button', null, 'Обновить данные'), msg = el('span', null, ''), keyBtn = el('button', 'linkish', '');
+  btn.type = 'button'; keyBtn.type = 'button'; msg.setAttribute('role', 'status');
+  row.append(btn, msg, keyBtn);
+  const form = el('form'); form.hidden = true;
+  const input = el('input'); input.type = 'password'; input.autocomplete = 'off'; input.placeholder = 'github_pat_…'; input.setAttribute('aria-label', 'Ключ доступа GitHub');
+  const save = el('button', 'primary', 'Сохранить ключ'); save.type = 'submit';
+  const forget = el('button', null, 'Удалить ключ'); forget.type = 'button';
+  const steps = el('ol');
+  ['Откройте ', 'Repository access → Only select repositories → portf.', 'Permissions → Repository permissions → Actions → Read and write.', 'Нажмите Generate token, скопируйте ключ и вставьте его сюда.'].forEach((t, i) => {
+    const li = el('li', null, t);
+    if (i === 0) { const a = el('a', null, 'создание ключа на GitHub'); a.href = 'https://github.com/settings/personal-access-tokens/new'; a.target = '_blank'; a.rel = 'noopener'; li.append(a, ' и задайте любое имя и срок действия.'); }
+    steps.appendChild(li);
+  });
+  const fr = el('div', 'upd-row'); fr.append(save, forget);
+  form.append(el('strong', null, 'Ключ для кнопки «Обновить данные»'), el('span', null, 'Нужен один раз. Ключ хранится только в этом браузере и даёт право лишь запускать обновление в этом репозитории.'), steps, input, fr);
+  box.append(row, form);
+  const paint = () => { keyBtn.textContent = getKey() ? 'сменить ключ' : 'нужен ключ: как получить'; forget.hidden = !getKey(); };
+  paint();
+  keyBtn.addEventListener('click', () => { form.hidden = !form.hidden; if (!form.hidden) input.focus(); });
+  forget.addEventListener('click', () => { setKey(''); input.value = ''; paint(); msg.textContent = 'Ключ удалён из этого браузера.'; });
+  form.addEventListener('submit', (e) => { e.preventDefault(); const v = input.value.trim(); if (!v) return; setKey(v); input.value = ''; form.hidden = true; paint(); run(); });
+  let timer = null;
+  async function run() {
+    const key = getKey();
+    if (!key) { form.hidden = false; input.focus(); msg.textContent = 'Сначала вставьте ключ.'; return; }
+    btn.disabled = true; msg.textContent = 'Запускаю обновление…';
+    try {
+      const r = await fetch('https://api.github.com/repos/' + REPO + '/actions/workflows/update.yml/dispatches', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + key, Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' },
+        body: JSON.stringify({ ref: 'main' }),
+      });
+      if (r.status === 401) throw new Error('ключ не подошёл или истёк — вставьте новый');
+      if (r.status === 403 || r.status === 404) throw new Error('у ключа нет права Actions: Read and write для репозитория portf');
+      if (!r.ok) throw new Error('GitHub ответил ' + r.status);
+    } catch (e) {
+      btn.disabled = false; msg.textContent = 'Не получилось: ' + e.message + '.';
+      if (/ключ/.test(e.message)) form.hidden = false;
+      return;
+    }
+    const before = window.lottoLast ? window.lottoLast() : 0, t0 = Date.now();
+    clearInterval(timer);
+    timer = setInterval(async () => {
+      const sec = Math.round((Date.now() - t0) / 1000);
+      if (sec > 40 && window.lottoRefresh) { try { await window.lottoRefresh(); } catch (e) {} }
+      const now = window.lottoLast ? window.lottoLast() : 0;
+      if (now > before) { clearInterval(timer); btn.disabled = false; msg.textContent = 'Готово: данные обновлены до тиража №' + now + '.'; return; }
+      if (sec > 300) { clearInterval(timer); btn.disabled = false; msg.textContent = 'Обновление выполнено, новых тиражей этой лотереи пока нет.'; return; }
+      msg.textContent = 'Обновление идёт на GitHub, обычно 1–3 минуты… ' + sec + ' с';
+    }, 10000);
+    msg.textContent = 'Обновление идёт на GitHub, обычно 1–3 минуты…';
+  }
+  btn.addEventListener('click', run);
 })();
 </script>
 </body>
