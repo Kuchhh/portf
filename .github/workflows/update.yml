@@ -1,10 +1,10 @@
-# Downloads new draws of «6 из 45» and «5 из 36» from stoloto.ru, rebuilds the pages and publishes them to the
+# Downloads new draws of «6 из 45», «5 из 36» and «Рапидо 2.0» from stoloto.ru, rebuilds the pages and publishes them to the
 # main branch, which GitHub Pages serves at https://kuchhh.github.io/portf/ and https://kuchhh.github.io/portf/5x36/
 name: Обновление тиражей
 
 on:
   schedule:
-    - cron: "12,42 * * * *" # every 30 minutes
+    - cron: "8,38 * * * *" # every 30 minutes, a few minutes after each Rapido draw
   workflow_dispatch:
     inputs:
       rebuild:
@@ -38,6 +38,11 @@ jobs:
         continue-on-error: true
         run: python3 lotto-5x36/gosloto536.py update
 
+      - name: Скачать тиражи «Рапидо 2.0»
+        id: urap
+        continue-on-error: true
+        run: python3 lotto-rapido2/rapido2.py update
+
       - name: Пересобрать страницы
         id: build
         run: |
@@ -53,6 +58,13 @@ jobs:
             python3 lotto-5x36/build.py --out 5x36
             changed=true
           fi
+          if [ "${{ inputs.rebuild }}" = "true" ]; then
+            python3 lotto-rapido2/build.py --out rapido2 --full
+            changed=true
+          elif ! git diff --quiet -- lotto-rapido2/draws_rapido2.csv lotto-rapido2/draws_rapido2.meta.json; then
+            python3 lotto-rapido2/build.py --out rapido2
+            changed=true
+          fi
           echo "changed=$changed" >> "$GITHUB_OUTPUT"
 
       - name: Опубликовать
@@ -60,16 +72,18 @@ jobs:
         run: |
           a=$(tail -n 1 lotto-6x45/draws_6x45.csv | cut -d, -f1)
           b=$(tail -n 1 lotto-5x36/draws_5x36.csv | cut -d, -f1)
+          c=$(tail -n 1 lotto-rapido2/draws_rapido2.csv | cut -d, -f1)
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add lotto-6x45/draws_6x45.csv lotto-6x45/draws_6x45.meta.json index.html draws.json \
-                  lotto-5x36/draws_5x36.csv lotto-5x36/draws_5x36.meta.json 5x36/index.html 5x36/state.json
+                  lotto-5x36/draws_5x36.csv lotto-5x36/draws_5x36.meta.json 5x36/index.html 5x36/state.json \
+                  lotto-rapido2/draws_rapido2.csv lotto-rapido2/draws_rapido2.meta.json rapido2/index.html rapido2/state.json
           if git diff --cached --quiet; then echo "Нечего публиковать."; exit 0; fi
-          git commit -m "Тиражи: 6 из 45 по №$a, 5 из 36 по №$b"
+          git commit -m "Тиражи: 6 из 45 по №$a, 5 из 36 по №$b, Рапидо 2.0 по №$c"
           git push origin HEAD:main
 
       - name: Сообщить о сбое загрузки
-        if: steps.u645.outcome == 'failure' || steps.u536.outcome == 'failure'
+        if: steps.u645.outcome == 'failure' || steps.u536.outcome == 'failure' || steps.urap.outcome == 'failure'
         run: |
-          echo "::error::Не удалось скачать тиражи: 6 из 45 — ${{ steps.u645.outcome }}, 5 из 36 — ${{ steps.u536.outcome }}"
+          echo "::error::Не удалось скачать тиражи: 6 из 45 — ${{ steps.u645.outcome }}, 5 из 36 — ${{ steps.u536.outcome }}, Рапидо 2.0 — ${{ steps.urap.outcome }}"
           exit 1
